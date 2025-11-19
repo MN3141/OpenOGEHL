@@ -6,6 +6,7 @@ set(CMAKE_BUILD_TYPE Debug)
 # Ensure debug builds include symbols and disable optimizations for easier debugging
 set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -g -O0 -fno-omit-frame-pointer")
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+set(RAYGUI_IMPLEMENTATION)
 
 # Gather source files
 file(GLOB SOURCES
@@ -17,7 +18,8 @@ add_executable(${PROJECT_NAME} ${SOURCES})
 target_include_directories(${PROJECT_NAME}
     PRIVATE
     ./libs/raylib/include
+    ./libs/raygui/src/
 )
 
 # Link raylib and other libraries
-target_link_libraries(${PROJECT_NAME} PRIVATE ${CMAKE_SOURCE_DIR}/libs/raylib/lib/libraylib.a m)
+target_link_libraries(${PROJECT_NAME} PRIVATE ${CMAKE_SOURCE_DIR}/libs/raylib/lib/libraylib.a m pthread)
