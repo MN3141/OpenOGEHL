@@ -10,7 +10,9 @@ set(RAYGUI_IMPLEMENTATION)
 
 # Gather source files
 file(GLOB SOURCES
-    "main.c"
+    main.c
+    ./src/bp/*.c
+    ./src/common/*.c
 )
 
 add_executable(${PROJECT_NAME} ${SOURCES})
@@ -19,6 +21,8 @@ target_include_directories(${PROJECT_NAME}
     PRIVATE
     ./libs/raylib/include
     ./libs/raygui/src/
+    ./src/bp/
+    ./src/common/
 )
 
 # Link raylib and other libraries
