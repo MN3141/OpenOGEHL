@@ -7,10 +7,15 @@
 #include "utils.h"
 
 /* ================================================= MACROS ================================================ */
+#define THRESHOLD_POSITIVE_SATURATION 127 /*Note: this value is for 7 bit unsigned counter*/
+#define THRESHOLD_NEGATIVE_SATURATION 0 /* See above point*/
 /* ============================================ LOCAL VARIABLES ============================================ */
 static uint32_t ghr = 0;
 static uint32_t bpTable[MAX_NUM_OF_TABLES][MAX_NUM_OF_TABLE_ENTRIES];
 static uint32_t L[MAX_NUM_OF_TABLES];
+static uint32_t theta_threshold = THETA_THRESHOLD;
+static uint32_t threshold_counter = 0; /*TBD*/
+static uint32_t perceptron_sum = 0;
 /* ============================================ GLOBAL VARIABLES =========================================== */
 /* ======================================= LOCAL FUNCTION DECLARATIONS ===================================== */
 static void BP_InitL();
@@ -48,7 +53,25 @@ static void BP_UpdateCounter(bool realOutcome, uint32_t* counter)
         *counter -= 1;
     }
 }
+static void BP_UpdateThreshold(bool realOutcome, bool predictedOutcome){
 
+    if (realOutcome!=predictedOutcome){
+        threshold_counter++;
+        if(threshold_counter == THRESHOLD_POSITIVE_SATURATION)
+        {
+            theta_threshold++;
+            threshold_counter = 0;
+        }
+    }
+    else if(abs(perceptron_sum) <= theta_threshold){
+        threshold_counter--;
+        if(threshold_counter == THRESHOLD_NEGATIVE_SATURATION)
+        {
+            theta_threshold--;
+            threshold_counter = 0;
+        }
+    }
+}
 /* ================================================ MODULE API ============================================= */
 void BP_Init(void)
 {
@@ -69,6 +92,7 @@ bool BP_GetPrediction(uint32_t pc, int32_t* sum)
         *sum += cnt;
     }
     *sum += (gNumOfTables/2);
+    perceptron_sum = *sum;
 
     return (*sum >= 0);
 }
@@ -86,7 +110,7 @@ void BP_Update(bool realOutcome, bool predictedOutcome, uint32_t currentPc, uint
             BP_UpdateCounter(realOutcome, &bpTable[tableIdx][cntIdx]);
         }
     }
-
+    BP_UpdateThreshold(realOutcome,predictedOutcome);
     /* TODO: Find out if we need to implement:
      * 3.2 Dynamic history length fitting
      * 3.3 Adaptive threshold fitting
