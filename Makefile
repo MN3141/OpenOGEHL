@@ -1,8 +1,23 @@
-make:
-	cmake -S . -B build -G "Unix Makefiles"
+# ==========================================================
+# Main app
+# ==========================================================
+all: clean
+	cmake -S . -B builds/app -G "Unix Makefiles"
 b:
-	cmake --build build
+	cmake --build builds/app
 r:
-	./build/OpenOGEHL
+	./builds/app/src/OpenOGEHL
 clean:
-	rm -rf build
+	rm -rf builds/app
+
+# ==========================================================
+# Unit tests
+# ==========================================================
+t: clean_test
+	cmake -S . -B builds/utest -DUNIT_TESTS=1 -G "Unix Makefiles"
+tb:
+	cmake --build builds/utest
+tr:
+	./builds/utest/test/OpenOGEHL_utest
+clean_test:
+	rm -rf builds/utest

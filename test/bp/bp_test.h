@@ -1,17 +1,16 @@
-#ifndef BP_TYPES
-#define BP_TYPES
+#ifndef BP_TEST
+#define BP_TEST
 
 /* ================================================ INCLUDES =============================================== */
-#include <stdint.h>
 /* ================================================= MACROS ================================================ */
 /* ======================================= TYPEDEFS, ENUMS, STRUCTS ======================================== */
-typedef uint8_t bpResponse_t;
-typedef int8_t bpCounter_t;
-typedef uint32_t bpGhr_t;
-typedef uint16_t bpTag_t;
-
 /* ============================================ INLINE FUNCTIONS =========================================== */
 /* ======================================= EXTERN GLOBAL VARIABLES ========================================= */
 /* =============================================== MODULE API ============================================== */
+void test_BP_InitL(void);
+void test_BP_GetCntIdx_GhrIsEmpty(void);
+void test_addValToCounter(void);
+void test_getCntSaturation(void);
+void test_BP_GetAliasingRatio_ColdStart(void);
 
-#endif /* BP_TYPES */
+#endif /* BP_TEST */

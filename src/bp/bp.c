@@ -1,48 +1,69 @@
 /* ================================================ INCLUDES =============================================== */
 #include "bp.h"
-#include "bp_config.h"
 #include <math.h>
+#include <stddef.h>
 #include <stdint.h>
 #include <stdlib.h>
+#include "bp_types.h"
 #include "utils.h"
+#include "bp_config.h"
+#include "bp_defines.h"
 
 /* ================================================= MACROS ================================================ */
-#define THRESHOLD_POSITIVE_SATURATION 127 /*Note: this value is for 7 bit unsigned counter*/
-#define THRESHOLD_NEGATIVE_SATURATION 0 /* See above point*/
+#define USE_LONG_GHR            (0xA5A5A5A5UL)
+#define USE_SHORT_GHR           (0xF0F0F0F0UL)
+#define AC_COUNTER_LEN          (0x9U)
+#define DYNAMIC_TABLE           (6U)
+#define THRESHOLD_COUNTER_LEN   (7U)
 
-#define USE_LONG_GHR   (0xA5A5A5A5UL)
-#define USE_SHORT_GHR  (0xF0F0F0F0UL)
-#define AC_COUNTER_LEN (0x9U)
-#define DYNAMIC_TABLE  (6U)
 /* ============================================ LOCAL VARIABLES ============================================ */
-static uint32_t bpTable[MAX_NUM_OF_TABLES][MAX_NUM_OF_TABLE_ENTRIES];
-static uint32_t tagTable[MAX_NUM_OF_TABLE_ENTRIES];
-static uint32_t L[MAX_NUM_OF_TABLES];
+BP_STATIC bpCounter_t bpTable[MAX_NUM_OF_TABLES][MAX_NUM_OF_TABLE_ENTRIES];
+BP_STATIC bpTag_t tagTable[MAX_NUM_OF_TABLE_ENTRIES];
+BP_STATIC size_t L[MAX_NUM_OF_TABLES];
 
-static uint32_t theta_threshold = THETA_THRESHOLD;
-static uint32_t threshold_counter = 0; /*TBD*/
-static int32_t perceptron_sum = 0;
+BP_STATIC uint32_t theta_threshold      = THETA_THRESHOLD;
+BP_STATIC uint32_t threshold_counter    = 0; /*TBD*/
+BP_STATIC int32_t perceptron_sum        = 0;
+BP_STATIC bpGhr_t ghr                   = 0;
+BP_STATIC uint32_t aliasingCounter      = 0; /* 9-bit counter */
+BP_STATIC uint32_t useLongGhr           = 0;
 
-static uint32_t ghr             = 0;
-static uint32_t aliasingCounter = 0; /* 9-bit counter */
-static uint32_t useLongGhr      = 0;
 /* ============================================ GLOBAL VARIABLES =========================================== */
 /* ======================================= LOCAL FUNCTION DECLARATIONS ===================================== */
-static void BP_InitL();
-static bpTableCounter_t BP_GetCntIdx(uint32_t tableIdx, uint32_t pc, uint32_t ghr, uint32_t ghrLen);
-static void BP_UpdateCounter(bool realOutcome, uint32_t* counter);
-static uint32_t BP_IsCounterSaturated(uint32_t counterVal, uint32_t counterLen);
-static uint32_t BP_GetAliasingRatio(bool realOutcome, bool predictedOutcome, uint32_t currentPc, int32_t sum);
+BP_STATIC void BP_InitL();
+BP_STATIC bpCounter_t BP_GetCntIdx(uint32_t tableIdx, uint32_t pc, bpGhr_t ghr, size_t ghrLen);
+BP_STATIC uint32_t BP_GetAliasingRatio(bool realOutcome, bool predictedOutcome, uint32_t currentPc, int32_t sum);
+BP_STATIC void BP_UpdateThreshold(bool realOutcome, bool predictedOutcome);
+BP_STATIC uint32_t BP_GetLIndex(uint32_t useLongGhr, uint32_t tableIndex);
+
 /* ======================================== LOCAL FUNCTION DEFINITIONS ===================================== */
-static void BP_InitL(void)
+BP_STATIC void BP_InitL(void)
 {
     for (int i = 0; i < MAX_NUM_OF_TABLES; i++)
     {
-        L[i] = ((pow(L_ALPHA, i) - 1) * L1 + 0.5);
+        L[i] = (uint32_t)((pow(L_ALPHA, i - 1)) * L1 + 0.5);
     }
 }
 
-static bpTableCounter_t BP_GetCntIdx(uint32_t tableIdx, uint32_t pc, uint32_t lGhr, uint32_t ghrLen)
+BP_STATIC uint32_t BP_GetLIndex(uint32_t useLongGhr, uint32_t tableIndex)
+{
+    if (useLongGhr == USE_LONG_GHR)
+    {
+        switch (tableIndex)
+        {
+            case 2:
+                return gNumOfTables + 1;
+            case 4:
+                return gNumOfTables + 2;
+            case 6:
+                return gNumOfTables + 3;
+        }
+    }
+
+    return tableIndex;
+}
+
+BP_STATIC bpCounter_t BP_GetCntIdx(uint32_t tableIdx, uint32_t pc, bpGhr_t lGhr, size_t ghrLen)
 {
     if (tableIdx == 0)
     {
@@ -52,73 +73,58 @@ static bpTableCounter_t BP_GetCntIdx(uint32_t tableIdx, uint32_t pc, uint32_t lG
     return pc ^ (lGhr & getMask(ghrLen));
 }
 
-static void BP_UpdateCounter(bool realOutcome, uint32_t* counter)
-{
-    if (realOutcome)
-    {
-         /* TAKEN */
-        *counter += 1;
-    }
-    else
-    {
-         /* NOT TAKEN */
-        *counter -= 1;
-    }
-}
-
-static uint32_t BP_IsCounterSaturated(uint32_t counterVal, uint32_t counterLen)
-{
-    return (counterVal == getMask(counterLen));
-}
-
-static uint32_t BP_GetAliasingRatio(bool realOutcome, bool predictedOutcome, uint32_t currentPc, int32_t sum)
+BP_STATIC uint32_t BP_GetAliasingRatio(bool realOutcome, bool predictedOutcome, uint32_t currentPc, int32_t sum)
 {
     uint32_t tag = 0;
     uint32_t tagIdx = 0;
 
-    if ((predictedOutcome != realOutcome) && (labs(sum) <= 0))
+    if ((predictedOutcome != realOutcome) /* Missprediction */ && (labs(sum) <= 0))
     {
         tagIdx = BP_GetCntIdx(DYNAMIC_TABLE, currentPc, ghr, L[DYNAMIC_TABLE]);
         tag = tagTable[tagIdx];
 
         if ((currentPc & 1) == tag)
         {
-            aliasingCounter++;
+            addValToCounter(&aliasingCounter, sizeof(aliasingCounter), AC_COUNTER_LEN, 1 /* value */);
         }
         else
         {
-            aliasingCounter -= 4;
+            addValToCounter(&aliasingCounter, sizeof(aliasingCounter), AC_COUNTER_LEN, -4 /* value */);
         }
 
         tagTable[tag] = currentPc & 1;
 
-        if (BP_IsCounterSaturated(aliasingCounter, AC_COUNTER_LEN))
+        if (CNT_SATURATED_POSITIVE == getCntSaturation(aliasingCounter, AC_COUNTER_LEN))
         {
             return USE_LONG_GHR;
         }
-        else
+
+        if (CNT_SATURATED_NEGATIVE == getCntSaturation(aliasingCounter, AC_COUNTER_LEN))
         {
             return USE_SHORT_GHR;
         }
     }
+
     return USE_SHORT_GHR;
 }
 
-static void BP_UpdateThreshold(bool realOutcome, bool predictedOutcome)
+BP_STATIC void BP_UpdateThreshold(bool realOutcome, bool predictedOutcome)
 {
     if (realOutcome!=predictedOutcome){
-        threshold_counter++;
-        if(threshold_counter == THRESHOLD_POSITIVE_SATURATION)
+        addValToCounter(&threshold_counter, sizeof(threshold_counter), THRESHOLD_COUNTER_LEN, 1 /* value */);
+
+        if(CNT_SATURATED_POSITIVE == getCntSaturation(threshold_counter, THRESHOLD_COUNTER_LEN))
         {
-            theta_threshold++;
+            addValToCounter(&theta_threshold, sizeof(theta_threshold), 8U, 1 /* value */); /* TODO: Theta is not a counter so it doesnt have a well defined length */
             threshold_counter = 0;
         }
     }
     else if(abs(perceptron_sum) <= theta_threshold){
-        threshold_counter--;
-        if(threshold_counter == THRESHOLD_NEGATIVE_SATURATION)
+        addValToCounter(&threshold_counter, sizeof(threshold_counter), THRESHOLD_COUNTER_LEN, -1 /* value */);
+
+        if(CNT_SATURATED_NEGATIVE == getCntSaturation(threshold_counter, THRESHOLD_COUNTER_LEN))
         {
-            theta_threshold--;
+            addValToCounter(&theta_threshold, sizeof(theta_threshold), 8U, -1 /* value */);/* TODO: Theta is not a counter so it doesnt have a well defined length */
             threshold_counter = 0;
         }
     }
@@ -143,28 +149,11 @@ bool BP_GetPrediction(uint32_t pc, int32_t* sum)
 
         *sum += cnt;
     }
+
     *sum += (gNumOfTables/2);
     perceptron_sum = *sum;
 
     return (*sum >= 0);
-}
-
-uint32_t BP_GetLIndex(uint32_t useLongGhr, uint32_t tableIndex)
-{
-    if (useLongGhr == USE_LONG_GHR)
-    {
-        switch (tableIndex)
-        {
-            case 2:
-                return gNumOfTables + 1;
-            case 4:
-                return gNumOfTables + 2;
-            case 6:
-                return gNumOfTables + 3;
-        }
-    }
-
-    return tableIndex;
 }
 
 void BP_Update(bool realOutcome, bool predictedOutcome, uint32_t currentPc, uint32_t nextPc, int32_t sum)
@@ -173,14 +162,21 @@ void BP_Update(bool realOutcome, bool predictedOutcome, uint32_t currentPc, uint
     uint32_t lIndex = 0;
 
     /* 3.1.1 Update the predictor counters */
-    if (predictedOutcome != realOutcome || labs(sum) < THETA_THRESHOLD)
+    if ((predictedOutcome != realOutcome) /* Missprediction */ || (labs(sum) <= THETA_THRESHOLD) /* Outliar or idk */)
     {
         for (int tableIdx = 0; tableIdx < gNumOfTables; tableIdx++)
         {
             lIndex = BP_GetLIndex(useLongGhr, tableIdx);
             cntIdx = BP_GetCntIdx(tableIdx, currentPc, ghr, L[lIndex]);
 
-            BP_UpdateCounter(realOutcome, &bpTable[tableIdx][cntIdx]);
+            if (realOutcome)
+            {
+                addValToCounter(&bpTable[tableIdx][cntIdx], sizeof(bpCounter_t), DEFAULT_COUNTER_LEN, 1 /* value */);
+            }
+            else
+            {
+                addValToCounter(&bpTable[tableIdx][cntIdx], sizeof(bpCounter_t), DEFAULT_COUNTER_LEN, -1 /* value */);
+            }
         }
     }
 

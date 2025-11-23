@@ -1,17 +1,24 @@
 /* ================================================ INCLUDES =============================================== */
-#include "bp.h"
-#include <stdlib.h>
-
+#include "unity.h"
+#include "bp_test.h"
 /* ================================================= MACROS ================================================ */
 /* ============================================ LOCAL VARIABLES ============================================ */
 /* ============================================ GLOBAL VARIABLES =========================================== */
 /* ======================================= LOCAL FUNCTION DECLARATIONS ===================================== */
 /* ======================================== LOCAL FUNCTION DEFINITIONS ===================================== */
-/* ================================================ MODULE API ============================================= */
-int main(int argc, char** argv)
-{
-    BP_Init();
+void setUp(void) { }
 
-    BP_GetPrediction(123, NULL);
-    return 0;
+void tearDown(void) { }
+
+/* ================================================ MODULE API ============================================= */
+int main(void)
+{
+    UNITY_BEGIN();
+
+    RUN_TEST(test_BP_InitL);
+    RUN_TEST(test_BP_GetCntIdx_GhrIsEmpty);
+    RUN_TEST(test_addValToCounter);
+    RUN_TEST(test_getCntSaturation);
+
+    return (UNITY_END());
 }
