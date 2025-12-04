@@ -13,9 +13,8 @@ int main(int argc, char** argv)
     bool predictedOutcome = 0;
 
     InitUI();
-
     BP_Init();
-
+    UILoop();
     predictedOutcome = BP_GetPrediction(123, &sum);
 
     BP_Update(1, predictedOutcome, 120, 124, sum);
