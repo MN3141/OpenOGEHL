@@ -1,14 +1,18 @@
-#ifndef UI
-#define UI
+#ifndef THREAD_COM
+#define THREAD_COM
+
 /* ================================================ INCLUDES =============================================== */
 /* ================================================= MACROS ================================================ */
-#define WIN_WIDTH 800
-#define WIN_HEIGHT 800
 /* ======================================= TYPEDEFS, ENUMS, STRUCTS ======================================== */
+typedef struct thread_com_t
+{
+    float prediction_result;
+    char *file_path;
+    int simulation_started;
+} thread_com_t;
+extern thread_com_t thread_com;
 /* ============================================ INLINE FUNCTIONS =========================================== */
 /* ======================================= EXTERN GLOBAL VARIABLES ========================================= */
 /* =============================================== MODULE API ============================================== */
 
-void InitUI();
-void UILoop();
-#endif /* UI */
+#endif /* THREAD_COM */
