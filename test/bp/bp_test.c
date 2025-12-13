@@ -43,9 +43,7 @@ void test_BP_InitL(void)
 
     LOG("\n");
 
-    TEST_ASSERT_EQUAL_UINT32(1,    L[0]); /* TODO: Conclude if the first number needs to be 0 or 1.
-                                           * Using the formula that the paper provides, generates 1
-                                           * for the first item, but they mention it to be 0. */
+    TEST_ASSERT_EQUAL_UINT32(1,    L[0]);
     TEST_ASSERT_EQUAL_UINT32(2,    L[1]);
     TEST_ASSERT_EQUAL_UINT32(4,    L[2]);
     TEST_ASSERT_EQUAL_UINT32(8,    L[3]);
@@ -85,7 +83,6 @@ void test_addValToCounter(void)
 
     counter = 0;
 
-    /* TODO: Find out if the counter has to be signed or unsigned */
     addValToCounter(&counter, sizeof(bpCounter_t), DEFAULT_COUNTER_LEN, -1 /* value */);
     TEST_ASSERT_EQUAL_UINT32(-1, counter);
 }
@@ -120,4 +117,6 @@ void test_getCntSaturation(void)
  * */
 void test_BP_GetAliasingRatio_ColdStart(void)
 {
+    // BS 2 151
+    TEST_ASSERT_EQUAL_HEX32(USE_SHORT_GHR, BP_GetAliasingRatio(1, 0, 2, 2));
 }

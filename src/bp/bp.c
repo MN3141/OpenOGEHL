@@ -10,8 +10,6 @@
 #include "bp_defines.h"
 
 /* ================================================= MACROS ================================================ */
-#define USE_LONG_GHR            (0xA5A5A5A5UL)
-#define USE_SHORT_GHR           (0xF0F0F0F0UL)
 #define AC_COUNTER_LEN          (0x9U)
 #define DYNAMIC_TABLE           (6U)
 #define THRESHOLD_COUNTER_LEN   (7U)
@@ -75,10 +73,10 @@ BP_STATIC bpCounter_t BP_GetCntIdx(uint32_t tableIdx, uint32_t pc, bpGhr_t lGhr,
 
 BP_STATIC uint32_t BP_GetAliasingRatio(bool realOutcome, bool predictedOutcome, uint32_t currentPc, int32_t sum)
 {
-    uint32_t tag = 0;
+    uint32_t tag    = 0;
     uint32_t tagIdx = 0;
 
-    if ((predictedOutcome != realOutcome) /* Missprediction */ && (labs(sum) <= 0))
+    if ((predictedOutcome != realOutcome) /* Missprediction */ && (labs(sum) <= THETA_THRESHOLD))
     {
         tagIdx = BP_GetCntIdx(DYNAMIC_TABLE, currentPc, ghr, L[DYNAMIC_TABLE]);
         tag = tagTable[tagIdx];

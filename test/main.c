@@ -1,6 +1,7 @@
 /* ================================================ INCLUDES =============================================== */
 #include "unity.h"
 #include "bp_test.h"
+#include "unity_internals.h"
 /* ================================================= MACROS ================================================ */
 /* ============================================ LOCAL VARIABLES ============================================ */
 /* ============================================ GLOBAL VARIABLES =========================================== */
@@ -19,6 +20,7 @@ int main(void)
     RUN_TEST(test_BP_GetCntIdx_GhrIsEmpty);
     RUN_TEST(test_addValToCounter);
     RUN_TEST(test_getCntSaturation);
+    RUN_TEST(test_BP_GetAliasingRatio_ColdStart);
 
     return (UNITY_END());
 }
