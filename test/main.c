@@ -21,6 +21,8 @@ int main(void)
     RUN_TEST(test_addValToCounter);
     RUN_TEST(test_getCntSaturation);
     RUN_TEST(test_BP_GetAliasingRatio_ColdStart);
+    RUN_TEST(test_BP_UpdateThreshold);
+    RUN_TEST(test_BP_GetPrediction);
 
     return (UNITY_END());
 }

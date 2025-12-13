@@ -12,5 +12,7 @@ void test_BP_GetCntIdx_GhrIsEmpty(void);
 void test_addValToCounter(void);
 void test_getCntSaturation(void);
 void test_BP_GetAliasingRatio_ColdStart(void);
+void test_BP_UpdateThreshold(void);
+void test_BP_GetPrediction(void);
 
 #endif /* BP_TEST */

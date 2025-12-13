@@ -25,11 +25,35 @@ uint32_t getCntSaturation(uint32_t counterVal, size_t counterLen)
     return 0;
 }
 
+void int32SafeCopy(int32_t* dest, void* source, size_t size)
+{
+    switch (size)
+    {
+        case sizeof(int8_t):
+            *dest = *(int8_t*)source;
+            return;
+        case sizeof(int16_t):
+            *dest = *(int16_t*)source;
+            return;
+        case sizeof(int32_t):
+            *dest = *(int32_t*)source;
+            return;
+        case sizeof(int64_t):
+            *dest = *(int64_t*)source;
+            return;
+        default:
+            return;
+    }
+}
+
+/**
+* Description: Adds a signed value to a counter of a variable length of bits
+*/
 void addValToCounter(void* counter, size_t counterSize, size_t counterLen, int32_t val)
 {
-    int64_t newVal = 0;
+    int32_t newVal = 0;
 
-    memcpy(&newVal, counter, counterSize);
+    int32SafeCopy(&newVal, counter, counterSize);
 
     uint32_t saturation = getCntSaturation(newVal, counterLen);
 
@@ -38,8 +62,8 @@ void addValToCounter(void* counter, size_t counterSize, size_t counterLen, int32
 
     newVal += val;
 
-    int64_t maxVal = getMask(counterLen - 1);
-    int64_t minVal = -(1 << (counterLen - 1));
+    int32_t maxVal = getMask(counterLen - 1);
+    int32_t minVal = -(1 << (counterLen - 1));
 
     if (newVal > maxVal || newVal < minVal)
         return;
