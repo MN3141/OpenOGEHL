@@ -56,7 +56,7 @@ void UILoop()
         if (load_trace_clicked)
             file_dialog_handle.windowActive = true;
 
-        if (start_sim_clicked)
+        if (start_sim_clicked && strcmp(trace_file_path,"") != 0)
         {
             thread_com.simulation_started = 1;
             thread_com.file_path = trace_file_path;
