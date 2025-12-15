@@ -8,6 +8,7 @@
 #include "gui_window_file_dialog.h"
 #include "style_dark.h"
 #include "thread_com.h"
+#include "bp.h"
 /* ================================================= MACROS ================================================ */
 #define PATH_SIZE 1000
 #define RESULT_SIZE 13

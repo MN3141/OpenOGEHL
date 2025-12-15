@@ -13,6 +13,13 @@
 /* ======================================= TYPEDEFS, ENUMS, STRUCTS ======================================== */
 /* ============================================ INLINE FUNCTIONS =========================================== */
 /* ======================================= EXTERN GLOBAL VARIABLES ========================================= */
+/* 4 - 12 tables */
+extern uint32_t gNumOfTables;
+/* 32Kb - 1Mb size */
+extern uint32_t gTableSize;
+/* 3 - 5 bit counters */
+extern uint32_t gCounterLen;
+
 /* =============================================== MODULE API ============================================== */
 void BP_Init(void);
 bool BP_GetPrediction(uint32_t pc, int32_t* sum);
