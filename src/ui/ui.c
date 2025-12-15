@@ -20,6 +20,7 @@ static Color current_background;
 static char trace_file_path[PATH_SIZE];
 static char file_name[PATH_SIZE] = "Foo";
 static char current_theme[6] = "Dark\0";
+static int text_size = 20;
 /* ======================================= LOCAL FUNCTION DECLARATIONS ===================================== */
 /* ======================================== LOCAL FUNCTION DEFINITIONS ===================================== */
 /* ================================================ MODULE API ============================================= */
@@ -27,7 +28,8 @@ void InitUI()
 {
     current_background = dark_background;
     InitWindow(WIN_WIDTH, WIN_HEIGHT, "Open O-GEHL");
-    GuiLoadStyleDark();;
+    GuiLoadStyleDark();
+    GuiSetStyle(DEFAULT, TEXT_SIZE, text_size); 
 
     file_dialog_handle = InitGuiWindowFileDialog(GetWorkingDirectory());
 }
@@ -43,7 +45,7 @@ void UILoop()
         int winH = GetScreenHeight();
         
         char prediction_label[RESULT_SIZE];
-        sprintf(prediction_label, "Rate: %d", thread_com.prediction_result);
+        sprintf(prediction_label, "Rate: %f", thread_com.prediction_result);
 
         bool loaded_file_label = GuiLabel((Rectangle){0.02f * winW, 0.1 * winH, 0.20f * winW, 0.10f * winH}, file_name);
         bool prediction_result_label = GuiLabel((Rectangle){0.02f * winW, 0.1 * winH + 0.10f * winH, 0.20f * winW, 0.10f * winH}, prediction_label);
@@ -66,11 +68,13 @@ void UILoop()
             {
                 strcpy(current_theme,"Light\0");
                 GuiLoadStyleDefault();
+                GuiSetStyle(DEFAULT, TEXT_SIZE, text_size);
                 current_background = light_background;
             }
             else{
                 strcpy(current_theme,"Dark\0");
                 GuiLoadStyleDark();
+                GuiSetStyle(DEFAULT, TEXT_SIZE, text_size);
                 current_background = dark_background;
             }
                 
@@ -85,6 +89,9 @@ void UILoop()
 
             file_name[PATH_SIZE - 1] = '\0';
             TraceLog(LOG_INFO, "FILE SELECTED");
+
+            file_dialog_handle.SelectFilePressed = false;
+            file_dialog_handle.windowActive = false;
         }
 
         EndDrawing();
