@@ -7,7 +7,6 @@
 #include <string.h>
 #include "bp_types.h"
 #include "utils.h"
-#include "bp_config.h"
 #include "bp_defines.h"
 
 /* ================================================= MACROS ================================================ */
