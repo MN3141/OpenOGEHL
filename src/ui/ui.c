@@ -12,15 +12,15 @@
 #define RESULT_SIZE 13
 #define INPUT_BUFFER_SIZE 50
 #define HELPER_TEXT_SIZE 100
+#define USED_TEXT_SIZE 20
 /* ============================================ LOCAL VARIABLES ============================================ */
 /* ============================================ GLOBAL VARIABLES =========================================== */
 static GuiWindowFileDialogState file_dialog_handle;
-static Color dark_background = GRAY;
+static Color dark_background = DARKGRAY;
 static Color light_background = RAYWHITE;
 static Color current_background;
 
 static Theme currentTheme = DARK_THEME;
-static int text_size = 20;
 /* ======================================= LOCAL FUNCTION DECLARATIONS ===================================== */
 /* ======================================== LOCAL FUNCTION DEFINITIONS ===================================== */
 /* ================================================ MODULE API ============================================= */
@@ -31,7 +31,8 @@ void InitUI()
     InitWindow(WIN_WIDTH, WIN_HEIGHT, "Open O-GEHL");
 
     GuiLoadStyleDark();
-    GuiSetStyle(DEFAULT, TEXT_SIZE, text_size);
+    GuiSetStyle(DEFAULT, TEXT_SIZE, USED_TEXT_SIZE);
+
     file_dialog_handle = InitGuiWindowFileDialog(GetWorkingDirectory());
 }
 void UILoop()
@@ -208,14 +209,14 @@ void UILoop()
                 case DARK_THEME:
                     currentTheme = LIGHT_THEME;
                     GuiLoadStyleDefault();
-                    GuiSetStyle(DEFAULT, TEXT_SIZE, text_size);
+                    GuiSetStyle(DEFAULT, TEXT_SIZE, USED_TEXT_SIZE);
                     current_background = light_background;
                     break;
 
                 case LIGHT_THEME:
                     currentTheme = DARK_THEME;
                     GuiLoadStyleDark();
-                    GuiSetStyle(DEFAULT, TEXT_SIZE, text_size);
+                    GuiSetStyle(DEFAULT, TEXT_SIZE, USED_TEXT_SIZE);
                     current_background = dark_background;
                     break;
             }
