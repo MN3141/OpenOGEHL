@@ -11,6 +11,7 @@
 #define PATH_SIZE 1000
 #define RESULT_SIZE 13
 #define INPUT_BUFFER_SIZE 50
+#define HELPER_TEXT_SIZE 100
 /* ============================================ LOCAL VARIABLES ============================================ */
 /* ============================================ GLOBAL VARIABLES =========================================== */
 static GuiWindowFileDialogState file_dialog_handle;
@@ -58,7 +59,11 @@ void UILoop()
     .yStepFactor = 0.10f
     };
     WidgetSizeParameters helperText = {
-        .xFactor = 0
+        .xFactor = 0.02f,
+        .yFactor = 0.5f,
+        .widthFactor = 0.4f,
+        .heightFactor = 0.3f,
+        .yStepFactor = 0.1f
     };
     char trace_file_path[PATH_SIZE];
     char file_name[PATH_SIZE] = "Foo";
@@ -69,7 +74,7 @@ void UILoop()
         };
 
     const char numOfTablesText[] = "Enter number of tables (4 - 12 tables):";
-    const char tableSizeText[] = "Enter size for a table in KB (32Kb - 1Mb range):";
+    const char tableSizeText[] = "Enter size for a table in KB (256 - 2048 B range):";
     const char counterLenText[] = "Enter number of bits used for the counters (3 - 5 bits):";
 
     char numOfTablesBuffer[INPUT_BUFFER_SIZE];
@@ -119,6 +124,7 @@ void UILoop()
             {buttonParameters.xFactor* winW, buttonParameters.yFactor* winH + 2* buttonParameters.yStepFactor*winH,
             buttonParameters.widthFactor* winW, buttonParameters.heightFactor* winH},
             "Start simulation");
+
         /* ======================================= Buttons ======================================= */
 
         /* ======================================= User input ======================================= */
@@ -138,6 +144,20 @@ void UILoop()
             counterLenBuffer, INPUT_BUFFER_SIZE, inputEditMode[COUNTER_LEN]);
         /* ======================================= User input ======================================= */
 
+        /* ======================================= Helper text ======================================= */
+        char helperTextBuffer[HELPER_TEXT_SIZE];
+        sprintf(helperTextBuffer,
+            "Current number of tables: %d\nCurrent table size: %d B\nCurrent counter size: %d bits",
+            thread_com.table_num, thread_com.table_size, thread_com.counter_len);
+
+        GuiLabel((Rectangle)
+            {helperText.xFactor*winW, helperText.yFactor* winH,
+            helperText.widthFactor* winW, helperText.heightFactor* winH},
+            helperTextBuffer);
+
+        /* ======================================= Helper text ======================================= */
+
+        /* ======================================= Widget logic ======================================= */
         if(userInput[TABLE_NUM])
         {
             if(IsKeyPressed(KEY_ENTER))
@@ -145,6 +165,8 @@ void UILoop()
                 int tableNum = atoi(numOfTablesBuffer);
                 if(tableNum < 4 || tableNum > 12)
                     strcpy(numOfTablesBuffer,"Please select a value between 4 and 12.");
+                else
+                    thread_com.table_num = tableNum;
             }
             else
                 strcpy(numOfTablesBuffer,numOfTablesText);
@@ -155,8 +177,10 @@ void UILoop()
             if(IsKeyPressed(KEY_ENTER))
             {
                 int tableSize = atoi(tableSizeBuffer);
-                if(tableSize < 32 || tableSize > 1024)
-                    strcpy(tableSizeBuffer,"Please select a value between 32 and 1024 KB.");
+                if(tableSize < 256 || tableSize > 2048)
+                    strcpy(tableSizeBuffer,"Please select a value between 258 and 2048 B.");
+                else
+                    thread_com.table_size = tableSize;
             }
             else
                 strcpy(tableSizeBuffer,tableSizeText);
@@ -169,6 +193,8 @@ void UILoop()
                 int counterLen = atoi(counterLenBuffer);
                 if(counterLen < 3 || counterLen > 5)
                     strcpy(counterLenBuffer,"Please select a value 3 and 5.");
+                else
+                    thread_com.counter_len = counterLen;
             }
             else
                 strcpy(counterLenBuffer,counterLenText);
@@ -208,6 +234,15 @@ void UILoop()
 
             file_dialog_handle.SelectFilePressed = false;
             file_dialog_handle.windowActive = false;
+        }
+
+        if (load_trace_clicked)
+            file_dialog_handle.windowActive = true;
+
+        if (start_sim_clicked && strcmp(trace_file_path,"") != 0)
+        {
+            thread_com.simulation_started = 1;
+            thread_com.file_path = trace_file_path;
         }
 
         /* ======================================= Widget logic ======================================= */

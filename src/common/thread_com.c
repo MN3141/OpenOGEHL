@@ -6,7 +6,10 @@
 thread_com_t thread_com = {
     .simulation_started = 0,
     .prediction_result = 0,
-    .file_path = ""
+    .file_path = "",
+    .table_num = 0,
+    .table_size = 0,
+    .counter_len = 0
 };
 /* ======================================= LOCAL FUNCTION DECLARATIONS ===================================== */
 /* ======================================== LOCAL FUNCTION DEFINITIONS ===================================== */

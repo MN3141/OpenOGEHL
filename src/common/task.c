@@ -27,6 +27,10 @@ static void *GetPredictionsTask(void *arg)
     int sum             = 0;
     int miss            = 0;
 
+    thread_com.table_num = gNumOfTables;
+    thread_com.table_size = gTableSize;
+    thread_com.counter_len = gCounterLen;
+
     while (1)
     {
         while (!thread_com.simulation_started);
