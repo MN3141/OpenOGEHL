@@ -27,15 +27,14 @@ static void *GetPredictionsTask(void *arg)
     int sum             = 0;
     int miss            = 0;
 
-    thread_com.table_num = gNumOfTables;
-    thread_com.table_size = gTableSize;
-    thread_com.counter_len = gCounterLen;
-
     while (1)
     {
         while (!thread_com.simulation_started);
 
         FILE *file_handle = fopen(thread_com.file_path, "r");
+        gNumOfTables      = thread_com.table_num;
+        gTableSize        = thread_com.table_size;
+        gCounterLen       = thread_com.counter_len;
         numOfInstr        = 1;
         real_outcome      = 0;
         prediction        = 0;

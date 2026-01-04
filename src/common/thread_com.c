@@ -1,15 +1,16 @@
 /* ================================================ INCLUDES =============================================== */
 #include "thread_com.h"
+#include "bp_defines.h"
 /* ================================================= MACROS ================================================ */
 /* ============================================ LOCAL VARIABLES ============================================ */
 /* ============================================ GLOBAL VARIABLES =========================================== */
 thread_com_t thread_com = {
     .simulation_started = 0,
-    .prediction_result = 0,
-    .file_path = "",
-    .table_num = 0,
-    .table_size = 0,
-    .counter_len = 0
+    .prediction_result  = 0,
+    .file_path          = "",
+    .table_num          = DEFAULT_NUM_OF_TABLES,
+    .table_size         = DEFAULT_NUM_OF_TABLE_ENTRIES,
+    .counter_len        = DEFAULT_COUNTER_LEN
 };
 /* ======================================= LOCAL FUNCTION DECLARATIONS ===================================== */
 /* ======================================== LOCAL FUNCTION DEFINITIONS ===================================== */

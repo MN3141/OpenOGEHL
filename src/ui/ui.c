@@ -9,8 +9,8 @@
 #include "thread_com.h"
 /* ================================================= MACROS ================================================ */
 #define PATH_SIZE 1000
-#define RESULT_SIZE 13
-#define INPUT_BUFFER_SIZE 50
+#define RESULT_SIZE 24
+#define INPUT_BUFFER_SIZE 100
 #define HELPER_TEXT_SIZE 100
 #define USED_TEXT_SIZE 20
 /* ============================================ LOCAL VARIABLES ============================================ */
@@ -35,48 +35,57 @@ void InitUI()
 
     file_dialog_handle = InitGuiWindowFileDialog(GetWorkingDirectory());
 }
+
 void UILoop()
 {
 
-    WidgetSizeParameters buttonParameters = {
-    .xFactor = 0.80f,
-    .yFactor = 0.25f,
-    .widthFactor = 0.20f,
-    .heightFactor = 0.10f,
-    .yStepFactor = 0.10f
+    WidgetSizeParameters buttonParameters =
+    {
+        .xFactor = 0.80f,
+        .yFactor = 0.25f,
+        .widthFactor = 0.20f,
+        .heightFactor = 0.10f,
+        .yStepFactor = 0.10f
     };
-    WidgetSizeParameters labelParameters = {
-    .xFactor = 0.02f,
-    .yFactor = 0.1,
-    .widthFactor = 0.20f,
-    .heightFactor = 0.10f,
-    .yStepFactor = 0.05f
+
+    WidgetSizeParameters labelParameters =
+    {
+        .xFactor = 0.02f,
+        .yFactor = 0.1,
+        .widthFactor = 0.20f,
+        .heightFactor = 0.10f,
+        .yStepFactor = 0.05f
     };
-    WidgetSizeParameters inputBoxParameters = {
-    .xFactor = 0.02f,
-    .yFactor = 0.25f,
-    .widthFactor = 0.60f,
-    .heightFactor = 0.10f,
-    .yStepFactor = 0.10f
+
+    WidgetSizeParameters inputBoxParameters =
+    {
+        .xFactor = 0.02f,
+        .yFactor = 0.25f,
+        .widthFactor = 0.60f,
+        .heightFactor = 0.10f,
+        .yStepFactor = 0.10f
     };
-    WidgetSizeParameters helperText = {
+
+    WidgetSizeParameters helperText =
+    {
         .xFactor = 0.02f,
         .yFactor = 0.5f,
         .widthFactor = 0.4f,
         .heightFactor = 0.3f,
         .yStepFactor = 0.1f
     };
+
     char trace_file_path[PATH_SIZE];
     char file_name[PATH_SIZE] = "Foo";
     char themes[THEMES_NUM][MAX_THEME_NAME_SIZE] =
-        {
-            "Dark Mode",
-            "Light Mode"
-        };
+    {
+        "Dark Mode",
+        "Light Mode"
+    };
 
     const char numOfTablesText[] = "Enter number of tables (4 - 12 tables):";
-    const char tableSizeText[] = "Enter size for a table in KB (256 - 2048 B range):";
-    const char counterLenText[] = "Enter number of bits used for the counters (3 - 5 bits):";
+    const char tableSizeText[]   = "Enter size for a table in KB (256 - 2048 B range):";
+    const char counterLenText[]  = "Enter number of bits used for the counters (3 - 5 bits):";
 
     char numOfTablesBuffer[INPUT_BUFFER_SIZE];
     char tableSizeBuffer[INPUT_BUFFER_SIZE];
@@ -85,9 +94,9 @@ void UILoop()
     bool inputEditMode[INPUT_NUM] = {false,false,false};
     bool userInput[INPUT_NUM] = {false,false,false};
 
-    strcpy(numOfTablesBuffer,numOfTablesText);
-    strcpy(tableSizeBuffer,tableSizeText);
-    strcpy(counterLenBuffer,counterLenText);
+    strcpy(numOfTablesBuffer, numOfTablesText);
+    strcpy(tableSizeBuffer, tableSizeText);
+    strcpy(counterLenBuffer, counterLenText);
 
     while (!WindowShouldClose())
     {
@@ -101,13 +110,21 @@ void UILoop()
         sprintf(prediction_label, "Rate: %f", thread_com.prediction_result);
 
         /* ======================================= Labels ======================================= */
-        GuiLabel((Rectangle){labelParameters.xFactor* winW, labelParameters.yFactor* winH,
-            labelParameters.widthFactor* winW, labelParameters.heightFactor* winH},
-            file_name);
+        GuiLabel(
+            (Rectangle){labelParameters.xFactor* winW,
+            labelParameters.yFactor* winH,
+            labelParameters.widthFactor* winW,
+            labelParameters.heightFactor* winH},
+            file_name
+        );
 
-        GuiLabel((Rectangle){labelParameters.xFactor* winW, labelParameters.yFactor* winH + labelParameters.yStepFactor*winH,
-            labelParameters.widthFactor* winW, labelParameters.heightFactor* winH},
-            prediction_label);
+        GuiLabel(
+            (Rectangle){labelParameters.xFactor* winW,
+            labelParameters.yFactor* winH + labelParameters.yStepFactor*winH,
+            labelParameters.widthFactor* winW,
+            labelParameters.heightFactor* winH},
+            prediction_label
+        );
         /* ======================================= Labels ======================================= */
 
         /* ======================================= Buttons ======================================= */
