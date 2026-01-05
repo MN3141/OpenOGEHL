@@ -1,28 +1,36 @@
-#ifndef BP
-#define BP
-
+#ifndef UI
+#define UI
 /* ================================================ INCLUDES =============================================== */
-#include <stdint.h>
-#include "bp_types.h"
-#include "stdbool.h"
-#include "bp_defines.h"
-
 /* ================================================= MACROS ================================================ */
-#define USE_LONG_GHR            (0xA5A5A5A5UL)
-#define USE_SHORT_GHR           (0xF0F0F0F0UL)
+#define WIN_WIDTH 1200
+#define WIN_HEIGHT 800
+#define THEMES_NUM 2
+#define MAX_THEME_NAME_SIZE 11
+#define INPUT_NUM 3
 /* ======================================= TYPEDEFS, ENUMS, STRUCTS ======================================== */
+typedef enum
+{
+    DARK_THEME,
+    LIGHT_THEME
+} Theme;
+typedef enum{
+    NONE = -1,
+    TABLE_NUM,
+    TABLE_SIZE,
+    COUNTER_LEN
+} UserInput;
+typedef struct
+{
+    float xFactor;
+    float yFactor;
+    float widthFactor;
+    float heightFactor;
+    float yStepFactor;
+} WidgetSizeParameters;
 /* ============================================ INLINE FUNCTIONS =========================================== */
 /* ======================================= EXTERN GLOBAL VARIABLES ========================================= */
-/* 4 - 12 tables */
-extern uint32_t gNumOfTables;
-/* 32Kb - 1Mb size */
-extern uint32_t gTableSize;
-/* 3 - 5 bit counters */
-extern uint32_t gCounterLen;
-
 /* =============================================== MODULE API ============================================== */
-void BP_Init(void);
-bool BP_GetPrediction(uint32_t pc, int32_t* sum);
-void BP_Update(bool realOutcome, bool predictedOutcome, uint32_t currentPc, uint32_t nextPc, int32_t sum);
 
-#endif /* BP */
+void InitUI();
+void UILoop();
+#endif /* UI */

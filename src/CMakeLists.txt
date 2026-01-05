@@ -11,6 +11,7 @@ file(GLOB SOURCES
     main.c
     ./bp/*.c
     ./common/*.c
+    ./ui/*.c
 )
 
 add_executable(${PROJECT_NAME} ${SOURCES})
@@ -22,6 +23,7 @@ target_include_directories(${PROJECT_NAME}
     ../libs/Unity/src/
     ./bp/
     ./common/
+    ./ui/
 )
 
 

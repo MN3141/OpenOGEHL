@@ -7,7 +7,6 @@
 #include <string.h>
 #include "bp_types.h"
 #include "utils.h"
-#include "bp_config.h"
 #include "bp_defines.h"
 
 /* ================================================= MACROS ================================================ */
@@ -20,13 +19,22 @@ BP_STATIC bpCounter_t bpTable[MAX_NUM_OF_TABLES][MAX_NUM_OF_TABLE_ENTRIES];
 BP_STATIC bpTag_t tagTable[MAX_NUM_OF_TABLE_ENTRIES];
 BP_STATIC size_t L[MAX_NUM_OF_TABLES];
 
-BP_STATIC uint32_t theta_threshold      = THETA_THRESHOLD;
-BP_STATIC uint32_t threshold_counter    = 0; /*TBD*/
+BP_STATIC uint32_t theta_threshold      = 0;
+BP_STATIC uint32_t threshold_counter    = 0;
 BP_STATIC bpGhr_t ghr                   = 0;
 BP_STATIC uint32_t aliasingCounter      = 0; /* 9-bit counter */
 BP_STATIC uint32_t useLongGhr           = 0;
 
 /* ============================================ GLOBAL VARIABLES =========================================== */
+/* 4 - 12 tables */
+uint32_t gNumOfTables = DEFAULT_NUM_OF_TABLES;
+
+/* 32Kb - 1Mb size */
+uint32_t gTableSize   = DEFAULT_NUM_OF_TABLE_ENTRIES;
+
+/* 3 - 5 bit counters */
+uint32_t gCounterLen  = DEFAULT_COUNTER_LEN;
+
 /* ======================================= LOCAL FUNCTION DECLARATIONS ===================================== */
 BP_STATIC void BP_InitL();
 BP_STATIC uint32_t BP_GetCntIdx(uint32_t tableIdx, uint32_t pc, bpGhr_t ghr, size_t ghrLen);
@@ -37,7 +45,7 @@ BP_STATIC uint32_t BP_GetLIndex(uint32_t useLongGhr, uint32_t tableIndex);
 /* ======================================== LOCAL FUNCTION DEFINITIONS ===================================== */
 BP_STATIC void BP_InitL(void)
 {
-    for (int i = 0; i < MAX_NUM_OF_TABLES; i++)
+    for (int i = 0; i < gNumOfTables; i++)
     {
         L[i] = (uint32_t)((pow(L_ALPHA, i - 1)) * L1 + 0.5);
     }
@@ -64,7 +72,7 @@ BP_STATIC uint32_t BP_GetLIndex(uint32_t useLongGhr, uint32_t tableIndex)
 BP_STATIC uint32_t BP_GetCntIdx(uint32_t tableIdx, uint32_t pc, bpGhr_t lGhr, size_t ghrLen)
 {
     uint32_t index;
-    
+
     if (tableIdx == 0)
     {
         index = pc;
@@ -75,7 +83,7 @@ BP_STATIC uint32_t BP_GetCntIdx(uint32_t tableIdx, uint32_t pc, bpGhr_t lGhr, si
     }
 
     /* Ensure index is within bounds of the table */
-    return index % MAX_NUM_OF_TABLE_ENTRIES;
+    return index % gTableSize;
 }
 
 BP_STATIC uint32_t BP_GetAliasingRatio(bool realOutcome, bool predictedOutcome, uint32_t currentPc, int32_t sum)
@@ -144,7 +152,7 @@ void BP_Init(void)
     memset(tagTable, 0, sizeof(tagTable));
     memset(L, 0, sizeof(L));
 
-    theta_threshold   = THETA_THRESHOLD;
+    theta_threshold   = gNumOfTables;
     threshold_counter = 0; /*TBD*/
     aliasingCounter   = 0; /* 9-bit counter */
     useLongGhr        = 0;
@@ -187,11 +195,11 @@ void BP_Update(bool realOutcome, bool predictedOutcome, uint32_t currentPc, uint
 
             if (realOutcome)
             {
-                addValToCounter(&bpTable[tableIdx][cntIdx], sizeof(bpCounter_t), DEFAULT_COUNTER_LEN, 1 /* value */);
+                addValToCounter(&bpTable[tableIdx][cntIdx], sizeof(bpCounter_t), gCounterLen, 1 /* value */);
             }
             else
             {
-                addValToCounter(&bpTable[tableIdx][cntIdx], sizeof(bpCounter_t), DEFAULT_COUNTER_LEN, -1 /* value */);
+                addValToCounter(&bpTable[tableIdx][cntIdx], sizeof(bpCounter_t), gCounterLen, -1 /* value */);
             }
         }
     }

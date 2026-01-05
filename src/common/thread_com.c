@@ -1,24 +1,17 @@
 /* ================================================ INCLUDES =============================================== */
-#include <stdio.h>
-#include <stdlib.h>
-#include "bp.h"
-#include "ui.h"
 #include "thread_com.h"
-#include "task.h"
+#include "bp_defines.h"
 /* ================================================= MACROS ================================================ */
 /* ============================================ LOCAL VARIABLES ============================================ */
 /* ============================================ GLOBAL VARIABLES =========================================== */
+thread_com_t thread_com = {
+    .simulation_started = 0,
+    .prediction_result  = 0,
+    .file_path          = "",
+    .table_num          = DEFAULT_NUM_OF_TABLES,
+    .table_size         = DEFAULT_NUM_OF_TABLE_ENTRIES,
+    .counter_len        = DEFAULT_COUNTER_LEN
+};
 /* ======================================= LOCAL FUNCTION DECLARATIONS ===================================== */
 /* ======================================== LOCAL FUNCTION DEFINITIONS ===================================== */
 /* ================================================ MODULE API ============================================= */
-int main(int argc, char **argv)
-{
-    int32_t sum;
-    bool predictedOutcome = 0;
-
-    InitUI();
-    CreateTasks();
-    UILoop();
-
-    return 0;
-}
