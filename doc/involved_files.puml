@@ -1,0 +1,42 @@
+@startuml
+title Involved Files
+
+left to right direction
+
+folder Raylib as raylib
+folder RayGUI as raygui
+
+
+folder OpenOGEHL as ogehl{
+
+    folder BranchPredictor as bp{
+        file bp_defines.h
+        file bp_types.h
+        file bp.h
+        file bp.c
+    }
+
+    folder common as com {
+        file task.h
+        file task.c
+        file thread_com.h
+        file thread_com.c
+        file utils.h
+        file utils.c
+    }
+
+    folder UI as ui{
+        file gui_window_file_dialog.h
+        file style_dark.h
+        file ui.h
+        file ui.c
+    }
+
+    file main.c
+}
+
+
+raygui->raylib
+ui->raygui
+
+@enduml

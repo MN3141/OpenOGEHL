@@ -1,0 +1,13 @@
+@startuml
+
+title Data transfer between UI and BranchPredictor
+left to right direction
+
+component Task as task
+component UI as ui
+component BranchPredictor as bp
+
+ui-(0-task:path to trace file
+task-(0-bp:starts parsing and prediction
+
+@enduml
