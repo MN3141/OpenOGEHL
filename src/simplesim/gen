@@ -1,0 +1,10 @@
+#!/bin/bash
+
+if [ -z "$1" ]; then
+    rm -rf build
+    cmake -S . -B build -G "Unix Makefiles"
+elif [[ "$1" == "b" ]]; then
+    cmake --build build -j 12
+elif [[ "$1" == "r" ]]; then
+    echo "not yet implemented"
+fi
