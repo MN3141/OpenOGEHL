@@ -6,5 +6,5 @@ if [ -z "$1" ]; then
 elif [[ "$1" == "b" ]]; then
     cmake --build build -j 12
 elif [[ "$1" == "r" ]]; then
-    echo "not yet implemented"
+    ./build/sim-bpred -redir:sim applu_simout.res  -redir:prog applu_progout.res -max:inst 500000000 -nice 1 -bpred oghel ./inputs/ss_files/applu.ss < ./inputs/in_files/applu.in
 fi

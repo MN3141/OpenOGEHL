@@ -84,6 +84,7 @@
 #include "stats.h"
 #include "bpred.h"
 #include "sim.h"
+#include "bp.h"   /* OGHEL predictor: gNumOfTables, gTableSize, gCounterLen */
 
 /*
  * This file implements a branch predictor analyzer.
@@ -123,6 +124,11 @@ static int ras_size = 8;
 static int btb_nelt = 2;
 static int btb_config[2] =
   { /* nsets */512, /* assoc */4 };
+
+/* OGHEL predictor config (<num_tables> <table_size> <counter_len>) */
+static int oghel_nelt = 3;
+static int oghel_config[3] =
+  { /* num_tables */7, /* table_size */2048, /* counter_len */4 };
 
 /* branch predictor */
 static struct bpred_t *pred;
@@ -165,7 +171,7 @@ sim_reg_options(struct opt_odb_t *odb)
 	       /* print */TRUE, /* format */NULL);
 
   opt_reg_string(odb, "-bpred",
-		 "branch predictor type {nottaken|taken|bimod|2lev|comb}",
+		 "branch predictor type {nottaken|taken|bimod|2lev|comb|oghel}",
                  &pred_type, /* default */"bimod",
                  /* print */TRUE, /* format */NULL);
 
@@ -197,6 +203,12 @@ sim_reg_options(struct opt_odb_t *odb)
 		   "BTB config (<num_sets> <associativity>)",
 		   btb_config, btb_nelt, &btb_nelt,
 		   /* default */btb_config,
+		   /* print */TRUE, /* format */NULL, /* !accrue */FALSE);
+
+  opt_reg_int_list(odb, "-bpred:oghel",
+		   "OGHEL predictor config (<num_tables> <table_size> <counter_len>)",
+		   oghel_config, oghel_nelt, &oghel_nelt,
+		   /* default */oghel_config,
 		   /* print */TRUE, /* format */NULL, /* !accrue */FALSE);
 }
 
@@ -271,6 +283,30 @@ sim_check_options(struct opt_odb_t *odb, int argc, char **argv)
 			  /* meta table size */comb_config[0],
 			  /* history reg size */twolev_config[2],
 			  /* history xor address */twolev_config[3],
+			  /* btb sets */btb_config[0],
+			  /* btb assoc */btb_config[1],
+			  /* ret-addr stack size */ras_size);
+    }
+  else if (!mystricmp(pred_type, "oghel"))
+    {
+      /* OpenOGHEL O-GEHL neural branch predictor */
+      if (oghel_nelt != 3)
+	fatal("bad oghel predictor config (<num_tables> <table_size> <counter_len>)");
+      if (btb_nelt != 2)
+	fatal("bad btb config (<num_sets> <associativity>)");
+
+      /* propagate user-supplied parameters into the OGHEL globals */
+      gNumOfTables = (unsigned int)oghel_config[0];
+      gTableSize   = (unsigned int)oghel_config[1];
+      gCounterLen  = (unsigned int)oghel_config[2];
+
+      pred = bpred_create(BPredOGHEL,
+			  /* bimod table size */0,
+			  /* 2lev l1 size */0,
+			  /* 2lev l2 size */0,
+			  /* meta table size */0,
+			  /* history reg size */0,
+			  /* history xor address */0,
 			  /* btb sets */btb_config[0],
 			  /* btb assoc */btb_config[1],
 			  /* ret-addr stack size */ras_size);

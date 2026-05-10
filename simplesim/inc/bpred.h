@@ -155,6 +155,7 @@ enum bpred_class {
   BPred2bit,			/* 2-bit saturating cntr pred (dir mapped) */
   BPredTaken,			/* static predict taken */
   BPredNotTaken,		/* static predict not taken */
+  BPredOGHEL,			/* OpenOGHEL O-GEHL neural branch predictor */
   BPred_NUM
 };
 
@@ -235,6 +236,11 @@ struct bpred_update_t {
     unsigned int twolev : 1;    /* 2-level predictor */
     unsigned int meta   : 1;    /* meta predictor (0..bimod / 1..2lev) */
   } dir;
+  /* OGHEL-specific: accumulator sum from BP_GetPrediction, used by BP_Update */
+  int   oghel_sum;
+  /* synthetic 0/3 counter so pdir1 can point here without special-casing
+     the existing BTB return-value logic */
+  unsigned char oghel_dir;
 };
 
 /* create a branch predictor */

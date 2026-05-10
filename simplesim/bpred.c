@@ -122,11 +122,13 @@
 #include <stdlib.h>
 #include <math.h>
 #include <assert.h>
+#include <stdbool.h>
 
 #include "host.h"
 #include "misc.h"
 #include "machine.h"
 #include "bpred.h"
+#include "bp.h"
 
 /* turn this on to enable the SimpleScalar 2.0 RAS bug */
 /* #define RAS_BUG_COMPATIBLE */
@@ -182,6 +184,11 @@ bpred_create(enum bpred_class class,	/* type of predictor to create */
     /* no other state */
     break;
 
+  case BPredOGHEL:
+    /* OGHEL manages its own internal state; just initialise it */
+    BP_Init();
+    break;
+
   default:
     panic("bogus predictor class");
   }
@@ -191,6 +198,7 @@ bpred_create(enum bpred_class class,	/* type of predictor to create */
   case BPredComb:
   case BPred2Level:
   case BPred2bit:
+  case BPredOGHEL:
     {
       int i;
 
@@ -401,6 +409,15 @@ bpred_config(struct bpred_t *pred,	/* branch predictor instance */
     bpred_dir_config (pred->dirpred.bimod, "nottaken", stream);
     break;
 
+  case BPredOGHEL:
+    fprintf(stream, "pred: OGHEL O-GEHL neural predictor: "
+            "%u tables, %u entries/table, %u-bit counters\n",
+            gNumOfTables, gTableSize, gCounterLen);
+    fprintf(stream, "btb: %d sets x %d associativity",
+            pred->btb.sets, pred->btb.assoc);
+    fprintf(stream, "ret_stack: %d entries", pred->retstack.size);
+    break;
+
   default:
     panic("bogus branch predictor class");
   }
@@ -441,6 +458,9 @@ bpred_reg_stats(struct bpred_t *pred,	/* branch predictor instance */
       break;
     case BPredNotTaken:
       name = "bpred_nottaken";
+      break;
+    case BPredOGHEL:
+      name = "bpred_oghel";
       break;
     default:
       panic("bogus branch predictor class");
@@ -696,6 +716,18 @@ bpred_lookup(struct bpred_t *pred,	/* branch predictor instance */
 	{
 	  return btarget;
 	}
+    case BPredOGHEL:
+      if ((MD_OP_FLAGS(op) & (F_CTRL|F_UNCOND)) != (F_CTRL|F_UNCOND))
+	{
+	  /* query the OGHEL predictor; store sum for later update */
+	  bool oghel_taken = BP_GetPrediction((uint32_t)baddr,
+	                                       &dir_update_ptr->oghel_sum);
+	  /* encode taken/not-taken as a 2-bit saturating counter value
+	     so the shared BTB return logic below works unchanged */
+	  dir_update_ptr->oghel_dir = oghel_taken ? 3 : 0;
+	  dir_update_ptr->pdir1     = (char *)&dir_update_ptr->oghel_dir;
+	}
+      break;
     default:
       panic("bogus predictor class");
   }
@@ -877,10 +909,18 @@ bpred_update(struct bpred_t *pred,	/* branch predictor instance */
   if (pred->class == BPredNotTaken || pred->class == BPredTaken)
     return;
 
-  /*
-   * Now we know the branch didn't use the ret-addr stack, and that this
-   * is a stateful predictor
-   */
+  /* OGHEL: delegate all direction-state updates to BP_Update, then fall
+   * through only for the BTB update (no L1/pdir counter updates needed). */
+  if (pred->class == BPredOGHEL)
+    {
+      if ((MD_OP_FLAGS(op) & (F_CTRL|F_UNCOND)) != (F_CTRL|F_UNCOND))
+        BP_Update((bool)taken, (bool)pred_taken,
+                  (uint32_t)baddr, (uint32_t)btarget,
+                  dir_update_ptr->oghel_sum);
+      /* skip the normal L1 / pdir1 / pdir2 / pmeta counter updates */
+      goto oghel_btb_update;
+    }
+
 
 #ifdef RAS_BUG_COMPATIBLE
   /* if function call, push return-address onto return-address stack */
@@ -910,6 +950,7 @@ bpred_update(struct bpred_t *pred,	/* branch predictor instance */
     }
 
   /* find BTB entry if it's a taken branch (don't allocate for non-taken) */
+  oghel_btb_update:
   if (taken)
     {
       index = (baddr >> MD_BR_SHIFT) & (pred->btb.sets - 1);
