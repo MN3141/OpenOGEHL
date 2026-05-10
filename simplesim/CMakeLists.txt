@@ -34,6 +34,7 @@ set(SIMPLESIM_FLAGS -O0 -g -Wall -w)
 
 # Include directories: the simplesim root so that machine.h / config.h resolve
 set(SIMPLESIM_ROOT ${CMAKE_CURRENT_SOURCE_DIR})
+set(OGHEL_ROOT     ${CMAKE_CURRENT_SOURCE_DIR}/../src/bp/)
 
 # ----------------------------------------------------------------------------
 # libexo static library
@@ -72,6 +73,11 @@ set(SIMPLESIM_COMMON_SRCS
     src/resource.c
 )
 
+set(OGHEL_COMMON_SRCS
+    ${OGHEL_ROOT}/bp.c
+    ${OGHEL_ROOT}/utils.c
+)
+
 # ----------------------------------------------------------------------------
 # sim-bpred
 # Extra sources: sim-bpred.c, bpred.c
@@ -80,8 +86,10 @@ add_executable(sim-bpred
     sim-bpred.c
     bpred.c
     ${SIMPLESIM_COMMON_SRCS}
+    ${OGHEL_COMMON_SRCS}
 )
 target_include_directories(sim-bpred PRIVATE ${SIMPLESIM_ROOT}/inc/)
+target_include_directories(sim-bpred PRIVATE ${OGHEL_ROOT})
 target_compile_definitions(sim-bpred PRIVATE ${SIMPLESIM_DEFS})
 target_compile_options(sim-bpred PRIVATE ${SIMPLESIM_FLAGS})
 target_link_libraries(sim-bpred PRIVATE exo m)
