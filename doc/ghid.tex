@@ -288,5 +288,27 @@ Ca urmare a efortului nostru de a integra predictorul OGEHL in cadrul SimpleSim 
 	
 \end{verbatim}
 
-\subsubsection{Arhitectura Software a aplicatie}
+\subsubsection{Arhitectura software a aplicatiei}
+Pentru a asigura o buna calitate software a aplicatiei si potentiala extindere a acesteia in diferite directii, s-a pus problema intocmirii unei arhitecturi simple dar robuste. Vom discuta in cele ce urmeaza cum a fost aceasta realizata pentru aplicatia clasica de OpenOGEHL, aceste decizii fiind valabile intr-o masura sau alta si in momentul integrarii cu SimpleSim.\\
+
+In ansamblu, aplicatia este constituita din urmatoarele componente principale: fisierele de tip trace ce conțin traseul parcurs de program, interfata grafica, responsabila pentru redarea utilizatorului a informatiilor necesare, preluarea configurarilor acestuia si transmiterea datelor necesare predictorului de salt (ex: numarul de tabele folosit), si intr-un final, predictorul de salturi in sine, ce implementeaza algoritmul O-GEHL discutat anterior, responsabila de a asemenea cu returnarea catre interfata grafica a ratei de miss (cat la suta din numarul prezis de salturi nu s-au efectuat de fapt)
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=0.7\textwidth]{images/arch0.png}
+	\caption{Componentele principale}
+\end{figure}
+
+La nivel de implementare software aplicatia pleacă de la un punct de start (numit deseori entry point in literatura de specialitate) dupa care se bifurca in doua fire de executie, unul pentru interfata grafica si altul pentru predictorul de salturi (abreviat drept BP). Aceasta decizie a fost luata din considerente de performanta si experienta a utilizatorului, anume sarcinile de calcul a preditiei care implica un consum de resurse mare de resurse au fost izolate de cele de redare a interfetei grafice. Evident, acest avantaj este valabil doar in sistemele avand procesoare cu mai multe nuclee (altfel, in loc de executie paralela are loc executie concurenta). Data fiind natura
+bibliotecilor grafice folosite (raylib, respectiv raygui) firul principal
+de executie revine interfetei cu utilizatorul.
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=0.7\textwidth]{images/arch1.png}
+	\caption{Interactiunea in timp a sistemului}
+\end{figure}
+
+Fiind acum familiar despre cum a fost aplicatia proiectata initial, este momentul sa discutam despre masurile luate pentru integrarea acesteia. Daca este sa ne aducem aminte de arhitectura SimpleSim vom observa usor ca predictorul nostru de ramificatii este situat la nivelul cel mai de jos, adica la nivelul Performance Core (responsabil pentru redarea comportamentului executiei micro-arhitecturii procesorului).Astfel, componenta grafica implementata de noi nu ne mai este folositoare, caci SimpleSim ofera deja utilizatorului o anumita interfata cu care poate lucra. Nemaifiind nevoie de un GUI evident ca putem simplifica structura si mai mult prin eliminarea firelor de executie, ramanand astfel doar cu logica ce implementeaza comportamentul unui predictor tip O-GEHL.
+
 \subsubsection{Generarea automata a rezultatelor}
