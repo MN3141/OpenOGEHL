@@ -1,0 +1,20 @@
+\babel@toc {romanian}{}\relax 
+\contentsline {section}{\numberline {1}Introducere}{3}{}%
+\contentsline {subsection}{\numberline {1.1}Simulatorul SimpleScalar}{3}{}%
+\contentsline {subsection}{\numberline {1.2}Predictorul de ramificatii OGEHL}{4}{}%
+\contentsline {subsection}{\numberline {1.3}Predictorul de valori Wang '97}{4}{}%
+\contentsline {subsection}{\numberline {1.4}OGEHL vs Wang~'97}{4}{}%
+\contentsline {subsection}{\numberline {1.5}Arhitectura Hardware OGEHL}{4}{}%
+\contentsline {paragraph}{Predictie.}{5}{}%
+\contentsline {paragraph}{Actualizare.}{5}{}%
+\contentsline {section}{\numberline {2}Configurarea aplicatiei}{7}{}%
+\contentsline {section}{\numberline {3}Ghid utilizare}{8}{}%
+\contentsline {subsection}{\numberline {3.1}Utilizarea simulatorului}{8}{}%
+\contentsline {subsubsection}{\numberline {3.1.1}Folosind OpenOGEHL clasic}{8}{}%
+\contentsline {subsubsection}{\numberline {3.1.2}Folosind OpenOGEHL ca parte a SimpleSim}{10}{}%
+\contentsline {subsection}{\numberline {3.2}Dezvoltarea simulatorului}{13}{}%
+\contentsline {subsection}{\numberline {3.3}Compiland OpenOGEHL}{13}{}%
+\contentsline {subsubsection}{\numberline {3.3.1}Arhitectura Software a aplicatie}{16}{}%
+\contentsline {subsubsection}{\numberline {3.3.2}Generarea automata a rezultatelor}{16}{}%
+\contentsline {section}{\numberline {4}Evaluarea rezultatelor}{17}{}%
+\contentsline {section}{\numberline {5}Concluzii}{18}{}%
