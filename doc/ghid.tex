@@ -109,7 +109,59 @@ Stiind acum acestea se pune problema de a rula simulator ce incorporeaza predict
 	fi
 \end{verbatim}
 
-Daca ar fi sa analizam un pic acest script vom putea observa ca acesta asteapta un argument pozitional la intrare (adica argument care este separat logic de catre celelalte prin pozitionarea acestuia in comanda intreaga de excutat; a se face contrast cu argumentele bazate pe flag.), acestuia putand fie "b" (de la \textit{build}) pentru a compila fie "r" (de la \textit{run}) pentru a rula. In functie de optiunea selectata logica corespunzatoare va fi executata.
+Daca ar fi sa analizam un pic acest script vom putea observa ca acesta asteapta un argument pozitional la intrare (adica argument care este separat logic de catre celelalte prin pozitionarea acestuia in comanda intreaga de excutat; a se face contrast cu argumentele bazate pe flag.), acestuia putand fie "b" (de la \textit{build}) pentru a compila fie "r" (de la \textit{run}) pentru a rula. In functie de optiunea selectata logica corespunzatoare va fi executata. \\
+
+Lansand din linia de comand programul \textit{sim-bpred} fara niciun argument vom fi intampinati de urmatorul mesaj ajutator care evidentiaza printre altele si optiunile valabile pentru predictorul OGEHL:
+
+\begin{verbatim}
+	sim-bpred: SimpleScalar/PISA Tool Set version 3.0 of November, 2000.
+	Copyright (c) 1994-2000 by Todd M. Austin.  All Rights Reserved.
+	This version of SimpleScalar is licensed for academic non-commercial use only.
+	
+	Usage: ./build/sim-bpred {-options} executable {arguments}
+	
+	sim-bpred: This simulator implements a branch predictor analyzer.
+	
+	#
+	# -option        <args>           #    <default> # description           
+	#
+	-config          <string>         #       <null> # load configuration from a file
+	-dumpconfig      <string>         #       <null> # dump configuration to a file
+	-h               <true|false>     #        false # print help message    
+	-v               <true|false>     #        false # verbose operation     
+	-d               <true|false>     #        false # enable debug message  
+	-i               <true|false>     #        false # start in Dlite debugger
+	-seed            <int>            #            1 # random number generator seed (0 for timer seed)
+	-q               <true|false>     #        false # initialize and terminate immediately
+	-chkpt           <string>         #       <null> # restore EIO trace execution from <fname>
+	-redir:sim       <string>         #       <null> # redirect simulator output to file (non-interactive only)
+	-redir:prog      <string>         #       <null> # redirect simulated program output to file
+	-nice            <int>            #            0 # simulator scheduling priority
+	-max:inst        <uint>           #            0 # maximum number of inst's to execute
+	-bpred           <string>         #        bimod # branch predictor type {nottaken|taken|bimod|2lev|comb|oghel}
+	-bpred:bimod     <int>            # 2048 # bimodal predictor config (<table size>)
+	-bpred:2lev      <int list...>    # 1 1024 8 0 # 2-level predictor config (<l1size> <l2size> <hist_size> <xor>)
+	-bpred:comb      <int>            # 1024 # combining predictor config (<meta_table_size>)
+	-bpred:ras       <int>            #            8 # return address stack size (0 for no return stack)
+	-bpred:btb       <int list...>    # 512 4 # BTB config (<num_sets> <associativity>)
+	-bpred:oghel     <int list...>    # 7 2048 4 # OGHEL predictor config (<num_tables> <table_size> <counter_len>)
+	
+	Branch predictor configuration examples for 2-level predictor:
+	Configurations:   N, M, W, X
+	N   # entries in first level (# of shift register(s))
+	W   width of shift register(s)
+	M   # entries in 2nd level (# of counters, or other FSM)
+	X   (yes-1/no-0) xor history and address for 2nd level index
+	Sample predictors:
+	GAg     : 1, W, 2^W, 0
+	GAp     : 1, W, M (M > 2^W), 0
+	PAg     : N, W, 2^W, 0
+	PAp     : N, W, M (M == 2^(N+W)), 0
+	gshare  : 1, W, 2^W, 1
+	Predictor `comb' combines a bimodal and a 2-level predictor.
+	
+	
+\end{verbatim}
 
 \subsection{Dezvoltarea simulatorului}
 \subsection{Compiland OpenOGEHL}

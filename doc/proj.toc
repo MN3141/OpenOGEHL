@@ -5,9 +5,9 @@
 \contentsline {subsection}{\numberline {3.1}Utilizarea simulatorului}{5}{}%
 \contentsline {subsubsection}{\numberline {3.1.1}Folosind OpenOGEHL clasic}{5}{}%
 \contentsline {subsubsection}{\numberline {3.1.2}Folosind OpenOGEHL ca parte a SimpleSim}{7}{}%
-\contentsline {subsection}{\numberline {3.2}Dezvoltarea simulatorului}{9}{}%
-\contentsline {subsection}{\numberline {3.3}Compiland OpenOGEHL}{9}{}%
-\contentsline {subsubsection}{\numberline {3.3.1}Arhitectura Software a aplicatie}{9}{}%
-\contentsline {subsubsection}{\numberline {3.3.2}Generarea automata a rezultatelor}{9}{}%
-\contentsline {section}{\numberline {4}Evaluarea rezultatelor}{10}{}%
-\contentsline {section}{\numberline {5}Concluzii}{11}{}%
+\contentsline {subsection}{\numberline {3.2}Dezvoltarea simulatorului}{10}{}%
+\contentsline {subsection}{\numberline {3.3}Compiland OpenOGEHL}{10}{}%
+\contentsline {subsubsection}{\numberline {3.3.1}Arhitectura Software a aplicatie}{10}{}%
+\contentsline {subsubsection}{\numberline {3.3.2}Generarea automata a rezultatelor}{10}{}%
+\contentsline {section}{\numberline {4}Evaluarea rezultatelor}{11}{}%
+\contentsline {section}{\numberline {5}Concluzii}{12}{}%
