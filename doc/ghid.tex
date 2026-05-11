@@ -4,7 +4,63 @@
 Dat fiind faptul ca OpenOGEHL a pornit ca a aplicatie de sine statatoare, fiind numai apoi integrate in cadrul suitei SimpleSim. acesta prezinta doua modalitati de functionare. Pe de o parte utilizatorul va avea la dispozitia acestuia o aplicatie grafica ce va permite procesarea unor fisiere de tip trace obtinute  urma rularii suitei de teste standard Stanford, iar pe de alta parte va mai avea posibilitatea de a-l ca modul pentru dezvoltarea de aplicatii in framework-ul SimpleSim.
 
 \subsubsection{Folosind OpenOGEHL clasic}
-Asa cum am mentionat anterior
+Asa cum am mentionat anterior OpenOGEHL a fost conceput ca o aplicatie separata. In versiunea originala aceasta are drept date intrare asa numitele fisiere \textit{trace} care are redau secvența de salturi facute (sau nu) sau, mai bine zis traseul parcurs de program. Aceste trasee au fost obținute în urma rularii suitei de teste standard Stanford ce contin diverse aplicatii precum fbubble.ins (care reda implementarea algoritmului de sortare Bubble Sort). Forma generala a unui salt este de forma <TipSalt> <AdresaCurenta> <AdresaDestinatie> (ex: BS
+2 110, unde adresa curenta denota de fapt valoarea registrului PC).
+Mai jos se pot observa mnemonicele folosite pentru salturi:
+
+\begin{table}[H]
+	\centering
+	\renewcommand{\arraystretch}{1.3}
+	
+	\begin{tabular}{|>{\centering\arraybackslash}m{3cm}|m{9cm}|}
+		\hline
+		\textbf{Mnemonica} & \textbf{Semnificația} \\
+		\hline
+		
+		BT & Branch Taken (saltul se face) \\
+		\hline
+		
+		BN & Branch Not Taken (saltul nu se face) \\
+		\hline
+		
+		BS & Branch to Subroutine (salt de tip call) \\
+		\hline
+		
+		BM & Return \\
+		\hline
+		
+		BR & Branch (salt necondiționat) \\
+		\hline
+	\end{tabular}
+	
+	\caption{Mnemonicele folosite}
+	\label{tab:branch_types}
+\end{table}
+
+Astfel, secvența data ca exemplu poate fi citita drept „Salt la subrutina incepand de la adresa 110”.\\
+
+Cand utilizatorul va lansa programul in executie va avea la dispoziția acestuia o fereastra principala de control si informatii ale predictorului. Astfel, ea este divizata in urmatoarele regiuni si functionalitati de la stanga la dreapta: trei
+campuri de text folosite pentru configurarea parametrilor predictorului de salturi (numarul de tabele folosite, dimensiunea unei tabele si numarul de biti per contor), informații privind fișierul de trace folosit, rezultatul predictiei si valorile curente ale parametrilor predictorului; trei butoane de control pentru a determina paleta de culori ai interfeței grafice (“Dark” si “Light”),
+a incarca fisierul de trace si a începe simularea.
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=0.7\textwidth]{images/dark_ui.png}
+	\caption{Interfata grafica setat pe modul Dark}
+\end{figure}
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=0.7\textwidth]{images/light_ui.png}
+	\caption{Interfata grafica setat pe modul Light}
+\end{figure}
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=0.7\textwidth]{images/load_trace.png}
+	\caption{Incarcand un fisier de tip trace}
+\end{figure}
+
 \subsubsection{Folosind OpenOGEHL ca parte a SimpleSim}
 
 \subsection{Dezvoltarea simulatorului}

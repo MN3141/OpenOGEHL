@@ -2,5 +2,11 @@
 \contentsline {section}{\numberline {1}Introducere}{3}{}%
 \contentsline {section}{\numberline {2}Configurarea aplicatiei}{4}{}%
 \contentsline {section}{\numberline {3}Ghid utilizare}{5}{}%
-\contentsline {section}{\numberline {4}Evaluarea rezultatelor}{6}{}%
-\contentsline {section}{\numberline {5}Concluzii}{7}{}%
+\contentsline {subsection}{\numberline {3.1}Utilizarea simulatorului}{5}{}%
+\contentsline {subsubsection}{\numberline {3.1.1}Folosind OpenOGEHL clasic}{5}{}%
+\contentsline {subsubsection}{\numberline {3.1.2}Folosind OpenOGEHL ca parte a SimpleSim}{7}{}%
+\contentsline {subsection}{\numberline {3.2}Dezvoltarea simulatorului}{7}{}%
+\contentsline {subsubsection}{\numberline {3.2.1}Arhitectura Software a aplicatie}{7}{}%
+\contentsline {subsubsection}{\numberline {3.2.2}Generarea automata a rezultatelor}{7}{}%
+\contentsline {section}{\numberline {4}Evaluarea rezultatelor}{8}{}%
+\contentsline {section}{\numberline {5}Concluzii}{9}{}%
