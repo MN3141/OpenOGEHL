@@ -1,1 +1,14 @@
 \section{Concluzii}
+
+Implementarea si integrarea predictorului de salturi O-GEHL in suita SimpleSim demonstreaza eficienta acestui algoritm in gestionarea corelațiilor de istorie lunga, oferind o alternativa robusta la predictorii standard furnizați de simulator.\\
+
+In urma activitatii de dezvoltare si testare, pot fi formulate urmatoarele concluzii principale:
+
+\begin{itemize}
+	\item Performanța si adaptabilitate: spre deosebire de predictorii clasici implementati în SimpleSim, precum \textit{bimodal} sau \textit{2-level}, OGEHL utilizeaza o dispunere geometrica a lungimilor de istorie in mai multe tabele de predictie. Această abordare permite capturarea simultana a tiparelor de salt pe termen scurt si lung, oferind o precizie superioara in executia speculativa.
+	\item Eficienta integrarii in SimpleSim: tranzitia de la aplicatia de sine statatoare \textit{OpenOGEHL} la un modul integrat in simulatorul \textit{sim-bpred} a permis validarea predictorului pe sarcini de lucru complexe, precum testele din suita Stanford (ex. \textit{fbubble.ins}). Integrarea la nivelul \textit{Performance Core} a eliminat necesitatea unei interfețe grafice, optimizand resursele pentru simularea microarhitecturala pura.
+	\item Diferențierea conceptuala: comparatia cu predictorul hibrid \textbf{Wang '97} a evidentiat rolul critic al O-GEHL in optimizarea fluxului de control, in contrast cu predictia de valori care vizeaza dependentele de date. Desi ambele sunt sisteme hibride, OGEHL se dovedeste a fi mai eficient in reducerea penalizarilor de predictie eronata prin mecanismele sale adaptive (ajustarea pragului $\theta$ si a lungimii istoriei).
+	\item Extensibilitatea mediului SimpleSim: Proiectul a reconfirmat faptul ca SimpleSim ramane o platforma flexibila pentru cercetarea academica, permitand adaugarea de noi functionalitati prin modificarea structurilor de date fundamentale (precum \textit{bp.h} si \textit{bpred.c}) intr-un mod mult mai direct decat simulatoarele moderne mai complexe.
+\end{itemize}
+
+In concluzie, lucrarea validează OGEHL ca o solutie de inalta performanta pentru unitatile de predictie de salt moderne, oferind o bază solida pentru experimente viitoare privind optimizarea consumului de putere sau reducerea aliasing-ului in tabelele de predicție.
