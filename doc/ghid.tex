@@ -62,7 +62,56 @@ a incarca fisierul de trace si a începe simularea.
 \end{figure}
 
 \subsubsection{Folosind OpenOGEHL ca parte a SimpleSim}
+Ca parte a efortului de cercetare si dezvoltare a arhitecturilor de calcul s-a propus integrarea aplicatiei OpenOGEHL deja existente ca parte a suitei de simulatoare SimpleSim. Scopul acestei sectiuni va fi de a ilustra succint integrarea amintita in timp ce structura SimpleSim va fi explicata in capitolul urmator (Dezvoltarea simulatorului). \\
+
+Structural vorbind, codul sursa pentru SimpleSim si OpenOGEHL este impartit in directoare diferite (a se consulta imaginea atasata) legatura dintre ele fiind realizata de catre fisierul \textbf{CMakeLists} ce serveste drept \textit{build system} al framework-ului SimpleSim (continut in directorul simplesim). Pe scurt, acel fisier face parte dintr-un sistem de procesare a fisierelor sursa C aferente proiectului cu scopul de a obtine intr-un final fisierul executabil, mai multe detalii fiind regasite in capitolul urmator.
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=0.7\textwidth]{images/proj_layout.png}
+	\caption{Structura ierarhica de directoare a OpenOGEHL}
+\end{figure}
+
+Din perspectiva utilizatorului este de ajuns pentru folosi fisierul antet \textit{bp.h} ce defineste interfata oferita de predictorul de salturi implementat de tip O-GEHL. Mai jos se vor putea observa fisierele incluse pentru realizarea simulatorului sim-bpred:
+
+\begin{verbatim}
+#include <stdio.h>
+#include <stdlib.h>
+#include <math.h>
+
+#include "host.h"
+#include "misc.h"
+#include "machine.h"
+#include "regs.h"
+#include "memory.h"
+#include "loader.h"
+#include "syscall.h"
+#include "dlite.h"
+#include "options.h"
+#include "stats.h"
+#include "bpred.h"
+#include "sim.h"
+#include "bp.h"   /* OGHEL predictor: gNumOfTables, gTableSize, gCounterLen */
+\end{verbatim}
+
+Stiind acum acestea se pune problema de a rula simulator ce incorporeaza predictorul de salturi dezvoltat de noi. Spre norocul utilizatorului, acesta are de asemenea la dispozitia acestuia un mic script in BASH ce compileaza si ruleaza cu o configuratie implicit selectata.
+
+\begin{verbatim}
+	#!/bin/bash
+	
+	if [ -z "$1" ]; then
+	rm -rf build
+	cmake -S . -B build -G "Unix Makefiles"
+	elif [[ "$1" == "b" ]]; then
+	cmake --build build -j 12
+	elif [[ "$1" == "r" ]]; then
+	./build/sim-bpred -redir:sim applu_simout.res  -redir:prog applu_progout.res -max:inst 500000000 -nice 1 -bpred oghel ./inputs/ss_files/applu.ss < ./inputs/in_files/applu.in
+	fi
+\end{verbatim}
+
+Daca ar fi sa analizam un pic acest script vom putea observa ca acesta asteapta un argument pozitional la intrare (adica argument care este separat logic de catre celelalte prin pozitionarea acestuia in comanda intreaga de excutat; a se face contrast cu argumentele bazate pe flag.), acestuia putand fie "b" (de la \textit{build}) pentru a compila fie "r" (de la \textit{run}) pentru a rula. In functie de optiunea selectata logica corespunzatoare va fi executata.
 
 \subsection{Dezvoltarea simulatorului}
+\subsection{Compiland OpenOGEHL}
 \subsubsection{Arhitectura Software a aplicatie}
 \subsubsection{Generarea automata a rezultatelor}
