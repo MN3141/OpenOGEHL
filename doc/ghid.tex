@@ -37,7 +37,7 @@ Mai jos se pot observa mnemonicele folosite pentru salturi:
 	\label{tab:branch_types}
 \end{table}
 
-Astfel, secvența data ca exemplu poate fi citita drept „Salt la subrutina incepand de la adresa 110”.\\
+Astfel, secventa data ca exemplu poate fi citita drept ``Salt la subrutina incepand de la adresa 110''.
 
 Cand utilizatorul va lansa programul in executie va avea la dispoziția acestuia o fereastra principala de control si informatii ale predictorului. Astfel, ea este divizata in urmatoarele regiuni si functionalitati de la stanga la dreapta: trei
 campuri de text folosite pentru configurarea parametrilor predictorului de salturi (numarul de tabele folosite, dimensiunea unei tabele si numarul de biti per contor), informații privind fișierul de trace folosit, rezultatul predictiei si valorile curente ale parametrilor predictorului; trei butoane de control pentru a determina paleta de culori ai interfeței grafice (“Dark” si “Light”),
@@ -62,7 +62,7 @@ a incarca fisierul de trace si a începe simularea.
 \end{figure}
 
 \subsubsection{Folosind OpenOGEHL ca parte a SimpleSim}
-Ca parte a efortului de cercetare si dezvoltare a arhitecturilor de calcul s-a propus integrarea aplicatiei OpenOGEHL deja existente ca parte a suitei de simulatoare SimpleSim. Scopul acestei sectiuni va fi de a ilustra succint integrarea amintita in timp ce structura SimpleSim va fi explicata in capitolul urmator (Dezvoltarea simulatorului). \\
+Ca parte a efortului de cercetare si dezvoltare a arhitecturilor de calcul s-a propus integrarea aplicatiei OpenOGEHL deja existente ca parte a suitei de simulatoare SimpleSim. Scopul acestei sectiuni va fi de a ilustra succint integrarea amintita in timp ce structura SimpleSim va fi explicata in capitolul urmator (Dezvoltarea simulatorului).
 
 Structural vorbind, codul sursa pentru SimpleSim si OpenOGEHL este impartit in directoare diferite (a se consulta imaginea atasata) legatura dintre ele fiind realizata de catre fisierul \textbf{CMakeLists} ce serveste drept \textit{build system} al framework-ului SimpleSim (continut in directorul simplesim). Pe scurt, acel fisier face parte dintr-un sistem de procesare a fisierelor sursa C aferente proiectului cu scopul de a obtine intr-un final fisierul executabil, mai multe detalii fiind regasite in capitolul urmator.
 
@@ -91,7 +91,8 @@ Din perspectiva utilizatorului este de ajuns pentru folosi fisierul antet \texti
 #include "stats.h"
 #include "bpred.h"
 #include "sim.h"
-#include "bp.h"   /* OGHEL predictor: gNumOfTables, gTableSize, gCounterLen */
+/* OGHEL predictor: gNumOfTables, gTableSize, gCounterLen */
+#include "bp.h"
 \end{verbatim}
 
 Stiind acum acestea se pune problema de a rula simulator ce incorporeaza predictorul de salturi dezvoltat de noi. Spre norocul utilizatorului, acesta are de asemenea la dispozitia acestuia un mic script in BASH ce compileaza si ruleaza cu o configuratie implicit selectata.
@@ -105,14 +106,21 @@ Stiind acum acestea se pune problema de a rula simulator ce incorporeaza predict
 	elif [[ "$1" == "b" ]]; then
 	cmake --build build -j 12
 	elif [[ "$1" == "r" ]]; then
-	./build/sim-bpred -redir:sim applu_simout.res  -redir:prog applu_progout.res -max:inst 500000000 -nice 1 -bpred oghel ./inputs/ss_files/applu.ss < ./inputs/in_files/applu.in
+	./build/sim-bpred \
+	  -redir:sim applu_simout.res \
+	  -redir:prog applu_progout.res \
+	  -max:inst 500000000 -nice 1 \
+	  -bpred oghel \
+	  ./inputs/ss_files/applu.ss \
+	  < ./inputs/in_files/applu.in
 	fi
 \end{verbatim}
 
-Daca ar fi sa analizam un pic acest script vom putea observa ca acesta asteapta un argument pozitional la intrare (adica argument care este separat logic de catre celelalte prin pozitionarea acestuia in comanda intreaga de excutat; a se face contrast cu argumentele bazate pe flag.), acestuia putand fie "b" (de la \textit{build}) pentru a compila fie "r" (de la \textit{run}) pentru a rula. In functie de optiunea selectata logica corespunzatoare va fi executata. \\
+Daca ar fi sa analizam un pic acest script vom putea observa ca acesta asteapta un argument pozitional la intrare (adica argument care este separat logic de catre celelalte prin pozitionarea acestuia in comanda intreaga de excutat; a se face contrast cu argumentele bazate pe flag.), acestuia putand fie "b" (de la \textit{build}) pentru a compila fie "r" (de la \textit{run}) pentru a rula. In functie de optiunea selectata logica corespunzatoare va fi executata.
 
-Lansand din linia de comand programul \textit{sim-bpred} fara niciun argument vom fi intampinati de urmatorul mesaj ajutator care evidentiaza printre altele si optiunile valabile pentru predictorul OGEHL:
+Lansand din linia de comanda programul \textit{sim-bpred} fara niciun argument vom fi intampinati de urmatorul mesaj ajutator care evidentiaza printre altele si optiunile valabile pentru predictorul OGEHL:
 
+{\small
 \begin{verbatim}
 	sim-bpred: SimpleScalar/PISA Tool Set version 3.0 of November, 2000.
 	Copyright (c) 1994-2000 by Todd M. Austin.  All Rights Reserved.
@@ -162,6 +170,7 @@ Lansand din linia de comand programul \textit{sim-bpred} fara niciun argument vo
 	
 	
 \end{verbatim}
+}
 
 \subsection{Dezvoltarea simulatorului}
 

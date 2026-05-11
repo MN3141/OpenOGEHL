@@ -140,8 +140,10 @@ interactioneaza intr-un pipeline de predictie si actualizare.
 \subsubsection*{Fluxul de functionare}
 
 \paragraph{Predictie.}
-Pentru un PC dat, fiecare tabel $i$ calculeaza un index prin
-$\mathit{idx}_i = (PC \oplus \mathit{GHR}[0:L[i]]) \bmod \mathit{tableSize}$.
+Pentru un PC dat, fiecare tabel $i$ calculeaza un index:
+\[
+  \mathit{idx}_i = \bigl(PC \oplus \mathit{GHR}[0:L[i]]\bigr) \bmod \mathit{tableSize}
+\]
 Contorul de la acel index este citit si adaugat la suma globala. Semnul sumei
 finale produce decizia binara.
 
@@ -176,6 +178,7 @@ Tabelul~\ref{tab:params}.
 
 \begin{table}[H]
     \centering
+    \small
     \begin{tabular}{|l|c|c|c|l|}
         \hline
         \textbf{Parametru} & \textbf{Implicit} & \textbf{Min} & \textbf{Max} & \textbf{Descriere} \\
