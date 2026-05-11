@@ -1,60 +1,86 @@
 #!/bin/bash
 
 # Usage:
-#   ./gen           - configure (cmake)
-#   ./gen b         - build
-#   ./gen r         - run with default config
-#   ./gen c1..c8    - run with a named configuration
-#   ./gen all       - run all configurations sequentially
+#   ./gen                        - configure (cmake)
+#   ./gen b                      - build
+#   ./gen <benchmark> r          - run default config for benchmark
+#   ./gen <benchmark> c1..c9     - run named config for benchmark
+#   ./gen <benchmark> all        - run all configs for benchmark
+#
+# Benchmarks: applu | cc1 | mgrid | compress | ijpeg
 #
 # OGHEL predictor params: -bpred:oghel <num_tables> <table_size> <counter_len>
 # Defaults:               num_tables=7  table_size=2048  counter_len=4
 
 BASE_CMD="./build/sim-bpred -max:inst 500000000 -nice 1 -bpred oghel"
-INPUT="./inputs/ss_files/applu.ss"
-STDIN="./inputs/in_files/applu.in"
+
+# ---- benchmark selection ----
+BENCHMARK="${1}"
+case "$BENCHMARK" in
+    applu)    SS_FILE="applu.ss";       IN_FILE="applu.in"   ;;
+    cc1)      SS_FILE="cc1.ss";         IN_FILE="1stm.i"   ;;
+    mgrid)    SS_FILE="mgrid.ss";       IN_FILE="mgrid.in"   ;;
+    compress) SS_FILE="compress95.ss";  IN_FILE="bigtest.in" ;;
+    ijpeg)    SS_FILE="ijpeg.ss";       IN_FILE="vgio.ppm"     ;;
+    b)
+        cmake --build build -j 12
+        exit 0
+        ;;
+    "")
+        rm -rf build
+        cmake -S . -B build -G "Unix Makefiles"
+        exit 0
+        ;;
+    *)
+        echo "Unknown benchmark: $1"
+        echo "Usage: $0 [applu|cc1|mgrid|compress|ijpeg] [r|c1..c9|all]"
+        exit 1
+        ;;
+esac
+
+INPUT="./inputs/ss_files/${SS_FILE}"
+STDIN="./inputs/in_files/${IN_FILE}"
+mkdir -p "./results/${BENCHMARK}"
 
 run_config() {
     local tag="$1"
     local num_tables="$2"
     local table_size="$3"
     local counter_len="$4"
-    echo "=== $tag: num_tables=$num_tables  table_size=$table_size  counter_len=$counter_len ==="
+    echo "=== ${BENCHMARK}/${tag}: num_tables=$num_tables  table_size=$table_size  counter_len=$counter_len ==="
     $BASE_CMD \
         -bpred:oghel $num_tables $table_size $counter_len \
-        -redir:sim  "${tag}_simout.res" \
-        -redir:prog "${tag}_progout.res" \
+        -redir:sim  "./results/${BENCHMARK}/${tag}_simout.res" \
+        -redir:prog "./results/${BENCHMARK}/${tag}_progout.res" \
         "$INPUT" < "$STDIN"
 }
 
-if [ -z "$1" ]; then
-    rm -rf build
-    cmake -S . -B build -G "Unix Makefiles"
+CMD="${2:-r}"
 
-elif [[ "$1" == "b" ]]; then
-    cmake --build build -j 12
-
-elif [[ "$1" == "r" ]]; then
-    # default config (same as before)
-    ./build/sim-bpred \
-        -redir:sim applu_simout.res \
-        -redir:prog applu_progout.res \
-        -max:inst 500000000 -nice 1 \
-        -bpred oghel \
-        "$INPUT" < "$STDIN"
-
-# ---------- named configurations ----------
-#                       num_tables  table_size  counter_len
-elif [[ "$1" == "c1" ]]; then run_config c1   4   512   3   # min tables, small table, short counters
-elif [[ "$1" == "c2" ]]; then run_config c2   4  2048   4   # min tables, default size
-elif [[ "$1" == "c3" ]]; then run_config c3   7   512   3   # default tables, small table, short counters
-elif [[ "$1" == "c4" ]]; then run_config c4   7  2048   4   # default (baseline)
-elif [[ "$1" == "c5" ]]; then run_config c5   7  2048   5   # default tables/size, long counters
-elif [[ "$1" == "c6" ]]; then run_config c6   7  8192   4   # default tables, larger table
-elif [[ "$1" == "c7" ]]; then run_config c7  12  2048   4   # max tables, default size
-elif [[ "$1" == "c8" ]]; then run_config c8  12  8192   4   # max tables, larger table
-elif [[ "$1" == "c9" ]]; then run_config c9  12  8192   5   # max tables, larger table, long counters
-
+case "$CMD" in
+    r)   run_config default 7 2048 4 ;;
+    # ---------- named configurations ----------
+    #                       num_tables  table_size  counter_len
+    c1)  run_config c1   4   512   3 ;;  # min tables, small table, short counters
+    c2)  run_config c2   4  2048   4 ;;  # min tables, default size
+    c3)  run_config c3   7   512   3 ;;  # default tables, small table, short counters
+    c4)  run_config c4   7  2048   4 ;;  # default (baseline)
+    c5)  run_config c5   7  2048   5 ;;  # default tables/size, long counters
+    c6)  run_config c6   7  8192   4 ;;  # default tables, larger table
+    c7)  run_config c7  12  2048   4 ;;  # max tables, default size
+    c8)  run_config c8  12  8192   4 ;;  # max tables, larger table
+    c9)  run_config c9  12  8192   5 ;;  # max tables, larger table, long counters
+    all)
+        for cfg in c1 c2 c3 c4 c5 c6 c7 c8 c9; do
+            "$0" "$BENCHMARK" "$cfg"
+        done
+        ;;
+    *)
+        echo "Unknown command: $CMD"
+        echo "Usage: $0 [applu|cc1|mgrid|compress|ijpeg] [r|c1..c9|all]"
+        exit 1
+        ;;
+esac
 elif [[ "$1" == "all" ]]; then
     for cfg in c1 c2 c3 c4 c5 c6 c7 c8 c9; do
         "$0" "$cfg"
