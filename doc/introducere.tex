@@ -15,7 +15,7 @@ sectiunea~\ref{sec:hw} detaliaza arhitectura hardware a OGEHL.
 \subsection{Simulatorul SimpleScalar}
 \label{sec:simplescalar}
 
-\textbf{SimpleScalar} este un set de instrumente care modeleaza un sistem de
+\textbf{SimpleScalar} este un set de instrumente \cite{austin1997user} care modeleaza un sistem de
 calcul virtual format din CPU, ierarhia de cache si memoria principala.
 Utilizand aceste instrumente, cercetatorii pot construi simulatoare pentru
 programe reale care ruleaza pe o gama variata de procesoare moderne.
@@ -47,7 +47,7 @@ reala, desi ele sunt simulate pe masina gazda.
 \label{sec:ogehl}
 
 \textbf{OGEHL} (Optimized Geometric History Length predictor) este un predictor
-de ramificatii modern care foloseste mai multe tabele de predictie, fiecare
+de ramificatii \cite{seznec2004gehl} modern care foloseste mai multe tabele de predictie, fiecare
 indexat cu o fereastra de istorie globala de lungime diferita. Lungimile
 sunt dispuse geometric, ceea ce permite capturarea atat a corelatiilor scurte,
 cat si a celor lungi din comportamentul branch-urilor. Contributiile fiecarui
@@ -59,7 +59,7 @@ pentru ajustarea pragului de decizie si a lungimii istoriei utilizate.
 \subsection{Predictorul de valori Wang '97}
 \label{sec:wang}
 
-\textbf{Wang~'97 hybrid value predictor} este un predictor de valori propus de
+\textbf{Wang~'97 hybrid value predictor} este un predictor de valori \cite{wang1997highly} propus de
 Wang si Franklin in 1997. Acesta combina mai multi predictori simpli (de tip
 \textit{last-value} si \textit{stride}) si foloseste un mecanism de selectie
 dinamica pentru a alege predictia cea mai probabila pentru valoarea rezultatului

@@ -1,7 +1,7 @@
 \documentclass[12pt,a4paper]{article}
+
 \usepackage{graphicx}
 \usepackage{float}
-
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
 \usepackage[romanian]{babel}
@@ -10,7 +10,7 @@
 \usepackage{array}
 \usepackage{graphicx}
 \usepackage{float}
-\usepackage{url}
+\usepackage{hyperref}
 
 \begin{document}
 
@@ -37,7 +37,7 @@
 	% Coordinator aligned to the left
 	\begin{flushleft}
 		{\Large \textbf{Coordonator științific laborator:}}\\[0.2cm]
-		{\Large asist. drd. ing. Adrian FLOREA}
+		{\Large prof. drd. ing. Adrian Florea}
 	\end{flushleft}
 
 	\vfill
@@ -60,6 +60,7 @@
 	\include{ghid}
 	\include{evaluare}
 	\include{concluzii}
-	\include{bibliografie}
 
+	\bibliographystyle{IEEEtran}
+	\bibliography{bibliografie}
 \end{document}

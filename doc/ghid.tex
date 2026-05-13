@@ -1,10 +1,10 @@
 \section{Ghid utilizare}
 \subsection{Utilizarea simulatorului}
 
-Dat fiind faptul ca OpenOGEHL a pornit ca a aplicatie de sine statatoare, fiind numai apoi integrate in cadrul suitei SimpleSim. acesta prezinta doua modalitati de functionare. Pe de o parte utilizatorul va avea la dispozitia acestuia o aplicatie grafica ce va permite procesarea unor fisiere de tip trace obtinute  urma rularii suitei de teste standard Stanford, iar pe de alta parte va mai avea posibilitatea de a-l ca modul pentru dezvoltarea de aplicatii in framework-ul SimpleSim.
+Dat fiind faptul ca OpenOGEHL a pornit ca a aplicatie de sine statatoare, fiind numai apoi integrate in cadrul suitei SimpleSim. acesta prezinta doua modalitati de functionare. Pe de o parte utilizatorul va avea la dispozitia acestuia o aplicatie grafica ce va permite procesarea unor fisiere de tip trace obtinute  urma rularii suitei de teste standard Stanford \cite{soac}, iar pe de alta parte va mai avea posibilitatea de a-l ca modul pentru dezvoltarea de aplicatii in framework-ul SimpleSim.
 
 \subsubsection{Folosind OpenOGEHL clasic}
-Asa cum am mentionat anterior OpenOGEHL a fost conceput ca o aplicatie separata. In versiunea originala aceasta are drept date intrare asa numitele fisiere \textit{trace} care are redau secvența de salturi facute (sau nu) sau, mai bine zis traseul parcurs de program. Aceste trasee au fost obținute în urma rularii suitei de teste standard Stanford ce contin diverse aplicatii precum fbubble.ins (care reda implementarea algoritmului de sortare Bubble Sort). Forma generala a unui salt este de forma <TipSalt> <AdresaCurenta> <AdresaDestinatie> (ex: BS
+Asa cum am mentionat anterior OpenOGEHL a fost conceput ca o aplicatie separata. In versiunea originala aceasta are drept date intrare asa numitele fisiere \textit{trace} care are redau secvența de salturi facute (sau nu) sau, mai bine zis traseul parcurs de program. Aceste trasee au fost obținute în urma rularii suitei de teste standard Stanford ce contin diverse aplicatii precum fbubble.ins (care reda implementarea algoritmului de sortare Bubble Sort). Forma generala a unui salt este de forma <TipSalt> <AdresaCurenta> <AdresaDestinatie>\cite{soac} (ex: BS
 2 110, unde adresa curenta denota de fapt valoarea registrului PC).
 Mai jos se pot observa mnemonicele folosite pentru salturi:
 
