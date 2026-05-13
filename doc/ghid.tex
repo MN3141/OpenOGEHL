@@ -456,3 +456,30 @@ Din perspectiva programarii, fiecare modul din SimpleScalar este alcatuit dintr-
 \end{figure}
 
 Aceasta includere nici macar nu este resimtita de catre programator deoarece din punctul sau de vedere el sau ea lucreaza doar cu componenta bpred. Evident, data fiind natura limbajului C in care nu exista o separare rigida intre interfata si implementare (cum ar fi de exemplu cazul limbajului C++), nimic nu impiedica utilizarea directa a OpenOGEHL a aplicatiei trecand astfel peste un nivel intermediar.
+
+Asa ca, ca daca ar fi sa privim prin prisma formalismului interfata-implementare, observam ca urmatoarele functii sunt puse la dispozitie:
+
+\begin{itemize}
+	\item BP\_Init(): responsabila pentru initializarea tabelelor din predictor
+	\item BP\_GetPrediction(): responsabila prezicerea saltului
+	\item BP\_Update(): responsabila pentru actualizarea contoarelor din tabele
+\end{itemize}
+
+In cele ce urmeaza vom prezenta logica din spatele acestei interfete oferite de aplicatie.\\
+
+\textbf{BP\_Init}\\
+Funtie responsabila de initializarea parametrilor interni ai predictorului si anume:
+\begin{itemize}
+	\item bpTable: tablou ce inglobeaza toate tabelele predictorului
+	\item aliasingCounter: contor folosit pentru a determina daca se va folosi istoria local sau globala
+	\item theta\_threshold: variabila ce memoreaza pragul folosit pentru a decide daca contoarele din tabelele predictorului vor fi actualizate sau nu.
+	\item ghr: serveste drept model pentru registrul GHR (Global History Register) 
+\end{itemize}
+
+\textbf{BP\_GetPrediction}
+Functie ce are ca parametru de intrare valoarea curenta a registrului PC, valoare ce va fi folosita in selectia tabelelor corespunzatoare. Aceasta selectie se face pe baza aplicarii operatiei logic SAU EXCLUSIV sau XOR intre ce se afla in PC si indexul tabelelor ce contin contoarele (a se vedea apelul functiei BP\_GetCntIdx). Dupa cum s-a mentionat anterior, algoritmul mentioneaza nevoia de a calcula suma 
+algebrica a contoarelor pentru a decide daca un salt se va face sau nu (da daca suma este pozitiva si nu altfel).
+
+\textbf{BP\_Update}
+Functie ce are ca parametri de intrare rezultatul predictiei (dacă se face sau nu saltul), rezultatul real, valoarea curenta a registrului PC împreuna cu valoarea adresei de salt. Aceasta funcție actualizeaza starea predictorului dupa ce predictia pentru salt a avut loc. Actualizăaile au loc daca predictorul a prezis incorect sau suma algebrica a ajuns sub nivelul pragului $\theta$ stabilit.
+
