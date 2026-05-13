@@ -36,15 +36,23 @@ Ceilalti parametri interni ai predictorului ($\alpha = 2$, $L_1 = 2$,
 $\theta$ initial $= N$) sunt fixati la compilare in
 \texttt{bp\_defines.h} si nu sunt expusi in interfata grafica, deoarece
 valorile lor sunt optime pentru majoritatea aplicatiilor conform
-literaturii de specialitate.
+literaturii de specialitate\cite{seznec2004gehl}. Dupa ordine parametrii sunt:
+
+\begin{itemize}
+	\item $\alpha$: Ponderea asociata fiecarui contor
+	\item $L_i$: Lungimea istoricului folosită pentru a adresa tabela $i$. Aceasta e definită ca o serie geometrică având forma:
+	\[
+	L(i) = \alpha^{i-1} \cdot L(1)
+	\]
+	\item $\theta$: Prag folosit in comparare cu suma algebrica a contoarelor
+\end{itemize}
 
 % -------------------------------------------------- Software
 \subsection{Toolchain software}
 \label{sec:toolchain}
 
 Proiectul este structurat in doua componente independente, fiecare cu
-propriul build target CMake: aplicatia principala si suita de unit
-tests.
+propriul build target CMake: aplicatia principala si suita de teste de unitate.
 
 \subsubsection*{Aplicatia principala}
 
@@ -55,14 +63,14 @@ interfata grafica:
     \item \textbf{raylib} --- librarie grafica multiplatforma scrisa in C,
           care ofera suport pentru ferestre, randare 2D/3D si gestionarea
           input-ului. In proiect este folosita ca dependenta de baza,
-          linkuita static din \texttt{libs/raylib/lib/libraylib.a}.
+          link-editat static din \texttt{libs/raylib/lib/libraylib.a}. Link descarcare:  \url{https://https://github.com/raysan5/raylib}
     \item \textbf{raygui} --- biblioteca \cite{raygui} pentru UI in mod imediat (\textit{immediate
           mode GUI}) construita peste raylib, folosita pentru a crea
           toate controalele interfetei (campuri de text, butoane, liste).
-          Este inclusa ca fisier header-only direct in sursa.
+          Este inclusa ca fisier header-only direct in sursa. Link descarcare: \url{https://github.com/raysan5/raygui}
 \end{itemize}
 
-Alegerea acestor librarii a fost motivata de faptul ca libraria
+Alegerea acestor biblioteci a fost motivata de faptul ca libraria
 predictorului OGEHL este scrisa in C, astfel incat integrarea unui
 toolkit grafic tot in C era solutia cea mai simpla si fara dependente
 suplimentare de runtime. Build-ul aplicatiei este gestionat cu
