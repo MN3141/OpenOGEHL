@@ -11,28 +11,28 @@ Mai jos se pot observa mnemonicele folosite pentru salturi:
 \begin{table}[H]
 	\centering
 	\renewcommand{\arraystretch}{1.3}
-	
+
 	\begin{tabular}{|>{\centering\arraybackslash}m{3cm}|m{9cm}|}
 		\hline
 		\textbf{Mnemonica} & \textbf{Semnificația} \\
 		\hline
-		
+
 		BT & Branch Taken (saltul se face) \\
 		\hline
-		
+
 		BN & Branch Not Taken (saltul nu se face) \\
 		\hline
-		
+
 		BS & Branch to Subroutine (salt de tip call) \\
 		\hline
-		
+
 		BM & Return \\
 		\hline
-		
+
 		BR & Branch (salt necondiționat) \\
 		\hline
 	\end{tabular}
-	
+
 	\caption{Mnemonicele folosite}
 	\label{tab:branch_types}
 \end{table}
@@ -99,7 +99,7 @@ Stiind acum acestea se pune problema de a rula simulator ce incorporeaza predict
 
 \begin{verbatim}
 	#!/bin/bash
-	
+
 	# Usage:
 	#   ./gen                        - configure (cmake)
 	#   ./gen b                      - build
@@ -111,9 +111,9 @@ Stiind acum acestea se pune problema de a rula simulator ce incorporeaza predict
 	#
 	# OGHEL predictor params: -bpred:oghel <num_tables> <table_size> <counter_len>
 	# Defaults:               num_tables=7  table_size=2048  counter_len=4
-	
+
 	BASE_CMD="./build/sim-bpred -max:inst 500000000 -nice 1 -bpred oghel"
-	
+
 	# ---- benchmark selection ----
 	BENCHMARK="${1}"
 	case "$BENCHMARK" in
@@ -137,11 +137,11 @@ Stiind acum acestea se pune problema de a rula simulator ce incorporeaza predict
 	exit 1
 	;;
 	esac
-	
+
 	INPUT="./inputs/ss_files/${SS_FILE}"
 	STDIN="./inputs/in_files/${IN_FILE}"
 	mkdir -p "./results/${BENCHMARK}"
-	
+
 	run_config() {
 		local tag="$1"
 		local num_tables="$2"
@@ -154,9 +154,9 @@ Stiind acum acestea se pune problema de a rula simulator ce incorporeaza predict
 		-redir:prog "./results/${BENCHMARK}/${tag}_progout.res" \
 		"$INPUT" < "$STDIN"
 	}
-	
+
 	CMD="${2:-r}"
-	
+
 	case "$CMD" in
 	r)   run_config default 7 2048 4 ;;
 	# ---------- named configurations ----------
@@ -185,13 +185,13 @@ Stiind acum acestea se pune problema de a rula simulator ce incorporeaza predict
 	for cfg in c1 c2 c3 c4 c5 c6 c7 c8 c9; do
 	"$0" "$cfg"
 	done
-	
+
 	else
 	echo "Unknown option: $1"
 	echo "Usage: $0 [b|r|c1..c9|all]"
 	exit 1
 	fi
-	
+
 \end{verbatim}
 
 Daca ar fi sa analizam un pic acest script vom putea observa ca acesta asteapta argumente pozitionale la intrare (adica argumente care sunt separate logic intre ele prin pozitionarea acestuia in cadrul comanzii intreagi de excutat; a se face contrast cu argumentele bazate pe flag.).Daca niciunul nu este pasat scriptului, atunci acesta implicit foloseste CMake pentru a general fisierele necesare compilarii, compilare ce va avea loc daca utilizatorul introduce optiunea "b" (de la \textbf{build}). Pentru a rula simularea in sine se poate alege una dintre cele noua configuratii predefinite ce tin de numarul tabelelor, marimea unei tabele si dimensiunea contorului aferent unei tabele. Mai multe detalii despre acestea vor fi oferita in capitolul urmator.
@@ -203,19 +203,19 @@ Lansand din linia de comanda programul \textit{sim-bpred} fara niciun argument v
 	sim-bpred: SimpleScalar/PISA Tool Set version 3.0 of November, 2000.
 	Copyright (c) 1994-2000 by Todd M. Austin.  All Rights Reserved.
 	This version of SimpleScalar is licensed for academic non-commercial use only.
-	
+
 	Usage: ./build/sim-bpred {-options} executable {arguments}
-	
+
 	sim-bpred: This simulator implements a branch predictor analyzer.
-	
+
 	#
-	# -option        <args>           #    <default> # description           
+	# -option        <args>           #    <default> # description
 	#
 	-config          <string>         #       <null> # load configuration from a file
 	-dumpconfig      <string>         #       <null> # dump configuration to a file
-	-h               <true|false>     #        false # print help message    
-	-v               <true|false>     #        false # verbose operation     
-	-d               <true|false>     #        false # enable debug message  
+	-h               <true|false>     #        false # print help message
+	-v               <true|false>     #        false # verbose operation
+	-d               <true|false>     #        false # enable debug message
 	-i               <true|false>     #        false # start in Dlite debugger
 	-seed            <int>            #            1 # random number generator seed (0 for timer seed)
 	-q               <true|false>     #        false # initialize and terminate immediately
@@ -231,7 +231,7 @@ Lansand din linia de comanda programul \textit{sim-bpred} fara niciun argument v
 	-bpred:ras       <int>            #            8 # return address stack size (0 for no return stack)
 	-bpred:btb       <int list...>    # 512 4 # BTB config (<num_sets> <associativity>)
 	-bpred:oghel     <int list...>    # 7 2048 4 # OGHEL predictor config (<num_tables> <table_size> <counter_len>)
-	
+
 	Branch predictor configuration examples for 2-level predictor:
 	Configurations:   N, M, W, X
 	N   # entries in first level (# of shift register(s))
@@ -245,8 +245,8 @@ Lansand din linia de comanda programul \textit{sim-bpred} fara niciun argument v
 	PAp     : N, W, M (M == 2^(N+W)), 0
 	gshare  : 1, W, 2^W, 1
 	Predictor `comb' combines a bimodal and a 2-level predictor.
-	
-	
+
+
 \end{verbatim}
 }
 
@@ -301,6 +301,178 @@ reducand probabilitatea ca doua ramificatii distincte sa partajeze acelasi conto
 reuneste avantajele istoricului global (capturarea corelatiilor inter-ramificatii), ale lungimilor geometrice (acoperire multi-scala),
 si ale votului prin suma (robustete la zgomot si alias), oferind o acuratete superioara predictorilor clasici la un buget de hardware comparabil.
 
+\subsection{Parametrii predictorului GEHL}
+
+Proiectarea unui predictor GEHL implică patru grade de libertate principale. Alegerea valorilor optime pentru fiecare parametru constituie un compromis
+între acuratețe, cost hardware și latență.
+
+\subsubsection*{Numărul de tabele $M$}
+
+GEHL utilizează $M$ tabele independente, fiecare indexat după un istoric de lungime
+diferită. Tabelul $T_0$ nu folosește istoric global (\textit{bias table}, $L[0]=0$),
+iar tabelele $T_1,\ldots,T_{M-1}$ utilizează lungimi crescătoare.
+Această diversificare permite capturarea atât a corelațiilor pe termen scurt, cât și
+a celor pe termen lung.
+
+Studiile empirice arată că intervalul $M \in [4,\,12]$ oferă cel mai bun raport
+acuratețe\,/\,cost. Sub 4 tabele granularitatea istoricului este insuficientă; peste 12
+câștigul marginal de precizie nu justifică costul hardware suplimentar
+(\textit{diminishing returns}).
+
+\subsubsection*{Contoarele saturate pe $k$ biți}
+
+Fiecare intrare dintr-un tabel stochează un contor saturat pe $k$ biți, care codifică
+„încrederea" predictorului pentru un anumit pattern de istoric.
+Valoarea implicită $k=4$ reprezintă un compromis bun: $k=2$ este prea instabil, iar
+$k\geq8$ risipește spațiu fără câștig semnificativ de acuratețe.
+
+\subsubsection*{Seria geometrică a lungimilor de istoric}
+
+Lungimile de istoric urmează o \textbf{progresie geometrică}:
+\[
+  L[i] = \left\lfloor \alpha^{\,i-1} \cdot L_1 + 0{,}5 \right\rfloor, \quad i = 1,\ldots,M-1
+\]
+unde $\alpha$ este factorul de creștere și $L_1$ este lungimea minimă de istoric
+(implicit $\alpha=2$, $L_1=2$, rezultând seria $\{0,2,4,8,16,32,64,128\}$).
+
+Față de o progresie liniară, cea geometrică acoperă eficient un interval larg de scări:
+istorii scurte asigură granularitate fină, iar creșterea exponențială permite atingerea
+rapidă a dependențelor îndepărtate. Valori extreme ale lui $\alpha$ sunt contraproductive:
+$\alpha\geq3$ introduce goluri în acoperire, iar $\alpha\approx1{,}2$ produce tabele
+redundante. Factorul $\alpha$ se poate calcula din lungimile extreme ale seriei:
+\[
+  \alpha = \left(\frac{L(M-1)}{L(1)}\right)^{\!\frac{1}{M-2}}
+\]
+
+\subsubsection*{Pragul de actualizare $\theta$}
+
+Predictorul calculează suma algebrică a contoarelor din toate tabelele,
+$S = \sum_{i=0}^{M-1} T_i$,
+și prezice \textit{taken} dacă $S \geq 0$, altfel \textit{not taken}.
+Contoarele sunt actualizate doar la mispredictie sau când $|S| \leq \theta$,
+evitând modificări inutile atunci când predictorul este deja sigur.
+
+Valoarea implicită $\theta \approx M$ este justificată de faptul că suma maximă crește
+proporțional cu numărul de tabele. Un $\theta$ prea mic conduce la actualizări excesive
+(instabilitate, overfitting); un $\theta$ prea mare încetinește adaptarea predictorului.
+
+\subsubsection*{Fluxul de functionare}
+
+\paragraph{Predictie.}
+Pentru un PC dat, fiecare tabel $i$ calculeaza un index:
+\[
+  \mathit{idx}_i = \bigl(PC \oplus \mathit{GHR}[0:L[i]]\bigr) \bmod \mathit{tableSize}
+\]
+Valoarea contorului de la acel index, $c_i$, este adaugata la suma globala:
+\[
+  S = \sum_{i=0}^{M-1} c_i[\,\mathit{idx}_i\,]
+\]
+Decizia finala de predictie este:
+\[
+  \hat{y} =
+  \begin{cases}
+    \textit{taken}     & \text{dacă } S \geq 0 \\
+    \textit{not taken} & \text{dacă } S < 0
+  \end{cases}
+\]
+
+\paragraph{Actualizare.}
+Dupa rezolvarea branch-ului, predictorul executa trei operatii in ordine:
+
+\begin{enumerate}
+    \item \textbf{Actualizarea contoarelor de predictie}: daca a existat
+          o mispredictie sau daca predictorul are incredere redusa in
+          predictie ($|\mathit{sum}| \leq \theta$), fiecare contor accesat
+          este actualizat prin incrementare (pentru branch \textit{taken})
+          sau decrementare (pentru branch \textit{not taken}).
+
+          Ideea este ca predictorul invata agresiv doar atunci cand:
+          \begin{itemize}
+              \item predictia a fost gresita; sau
+              \item predictia a fost corecta, dar confidence-ul a fost mic.
+          \end{itemize}
+
+          Astfel se evita modificarea inutila a contoarelor atunci cand
+          predictorul este deja foarte sigur de decizie.
+
+    \item \textbf{Ajustarea dinamica a lungimii istoriei}
+          (\textit{Dynamic History Length Fitting}): mecanismul monitorizeaza
+          mispredictiile recente pentru a detecta daca acestea sunt cauzate
+          de aliasing (coliziuni intre istorii diferite care acceseaza
+          aceeasi intrare din tabel).
+
+          Daca aliasing counter-ul satureaza pozitiv, predictorul considera
+          ca istoricul curent este insuficient pentru capturarea corelatiilor
+          si activeaza un GHR (\textit{Global History Register}) mai lung
+          pentru tabelele cu indici pari. Daca aliasing counter-ul satureaza
+          negativ, predictorul revine la un GHR mai scurt pentru reducerea
+          zgomotului si a aliasing-ului.
+
+          Comutarea doar pentru jumatate dintre tabele permite coexistenta:
+          \begin{itemize}
+              \item corelatiilor locale (istorii scurte);
+              \item corelatiilor pe termen lung (istorii lungi).
+          \end{itemize}
+
+          Astfel predictorul se poate adapta dinamic la diferite aplicatii
+          sau chiar la faze diferite ale aceluiasi program.
+
+    \item \textbf{Ajustarea adaptiva a pragului $\theta$}
+          (\textit{Adaptive Threshold Fitting}): pragul $\theta$ controleaza
+          confidence-ul minim necesar pentru a evita actualizarea predictorului.
+
+          Predictorul produce o suma:
+
+          \[
+              \mathit{sum} = \sum_i T_i
+          \]
+
+          iar magnitudinea $|\mathit{sum}|$ reprezinta nivelul de incredere
+          al predictiei.
+
+          Threshold counter-ul este incrementat la mispredictie si decrementat
+          atunci cand predictia este corecta, dar confidence-ul este redus
+          ($|\mathit{sum}| \leq \theta$). La saturare, valoarea lui $\theta$
+          este ajustata automat:
+
+          \begin{itemize}
+              \item cresterea lui $\theta$ face predictorul mai agresiv,
+                    permitand mai multe update-uri;
+              \item scaderea lui $\theta$ face predictorul mai conservator,
+                    reducand update-urile inutile.
+          \end{itemize}
+
+          Acest mecanism permite adaptarea dinamica a sensibilitatii
+          predictorului la comportamentul curent al aplicatiei si reduce
+          atat zgomotul, cat si supra-antrenarea predictorului.
+\end{enumerate}
+
+\subsubsection*{Parametrii predictorului}
+
+Implementarea expune trei parametri configurabili, prezentati in
+Tabelul~\ref{tab:params}.
+
+\begin{table}[H]
+    \centering
+    \small
+    \begin{tabular}{|l|c|c|c|l|}
+        \hline
+        \textbf{Parametru} & \textbf{Implicit} & \textbf{Min} & \textbf{Max} & \textbf{Descriere} \\
+        \hline
+        Numar de tabele ($N$)      & 7    & 4 & 12    & Numarul de tabele de predictie \\
+        Marimea tabelelor          & 2048 & 1 & 88000 & Numarul de intrari per tabel \\
+        Lungimea contoarelor ($k$) & 4    & 3 & 5     & Precizia contoarelor saturate (biti) \\
+        \hline
+        $\alpha$ (raport geometric) & 2   & -- & --   & Factorul de crestere al istoriei \\
+        $L_1$ (istorie minima)      & 2   & -- & --   & Lungimea istoriei pentru tabelul 1 \\
+        $\theta$ initial            & $N$ & -- & --   & Pragul adaptiv de actualizare \\
+        \hline
+    \end{tabular}
+    \caption{Parametrii predictorului OGEHL}
+    \label{tab:params}
+\end{table}
+
+
 \subsection{Compiland OpenOGEHL}
 Asa cum am promis in capitolul anterior, este timpul sa prezentam succint modul in care OpenOGEHL (fie in varianta ei clasica sau ca modul integrat) este compilat.\\
 
@@ -319,9 +491,9 @@ Ca urmare a efortului nostru de a integra predictorul OGEHL in cadrul SimpleSim 
 \begin{verbatim}
 	cmake_minimum_required(VERSION 3.16)
 	project(simplesim C)
-	
+
 	set(CMAKE_C_STANDARD 99)
-	
+
 	# ----------------------------------------------------------------------------
 	# Compile flags matching the original Makefile defaults
 	# MFLAGS: from sysprobe (little-endian Linux x86-64)
@@ -336,9 +508,9 @@ Ca urmare a efortului nostru de a integra predictorul OGEHL in cadrul SimpleSim 
 	GZIP_PATH="/bin/gzip"
 	DEBUG
 	)
-	
+
 	set(SIMPLESIM_FLAGS -O0 -g -Wall -w)
-	
+
 	# ----------------------------------------------------------------------------
 	# Target: target-pisa (hard-coded; replaces the old config-pisa symlinks)
 	# The top-level simplesim dir already has symlinks:
@@ -350,11 +522,11 @@ Ca urmare a efortului nostru de a integra predictorul OGEHL in cadrul SimpleSim 
 	#   symbol.c  -> target-pisa/symbol.c
 	#   syscall.c -> target-pisa/syscall.c
 	# ----------------------------------------------------------------------------
-	
+
 	# Include directories: the simplesim root so that machine.h / config.h resolve
 	set(SIMPLESIM_ROOT ${CMAKE_CURRENT_SOURCE_DIR})
 	set(OGHEL_ROOT     ${CMAKE_CURRENT_SOURCE_DIR}/../src/bp/)
-	
+
 	# ----------------------------------------------------------------------------
 	# libexo static library
 	# exolex.c is a pre-generated flex output already present in the repo.
@@ -366,7 +538,7 @@ Ca urmare a efortului nostru de a integra predictorul OGEHL in cadrul SimpleSim 
 	target_include_directories(exo PUBLIC ${SIMPLESIM_ROOT})
 	target_compile_definitions(exo PRIVATE ${SIMPLESIM_DEFS})
 	target_compile_options(exo PRIVATE ${SIMPLESIM_FLAGS})
-	
+
 	# ----------------------------------------------------------------------------
 	# Common objects shared by all simulators
 	# (main.c, plus the platform-independent support files)
@@ -391,12 +563,12 @@ Ca urmare a efortului nostru de a integra predictorul OGEHL in cadrul SimpleSim 
 	src/eventq.c
 	src/resource.c
 	)
-	
+
 	set(OGHEL_COMMON_SRCS
 	${OGHEL_ROOT}/bp.c
 	${OGHEL_ROOT}/utils.c
 	)
-	
+
 	# ----------------------------------------------------------------------------
 	# sim-bpred
 	# Extra sources: sim-bpred.c, bpred.c
@@ -412,7 +584,7 @@ Ca urmare a efortului nostru de a integra predictorul OGEHL in cadrul SimpleSim 
 	target_compile_definitions(sim-bpred PRIVATE ${SIMPLESIM_DEFS})
 	target_compile_options(sim-bpred PRIVATE ${SIMPLESIM_FLAGS})
 	target_link_libraries(sim-bpred PRIVATE exo m)
-	
+
 \end{verbatim}
 
 \subsubsection{Arhitectura software OpenOGEHL clasic}

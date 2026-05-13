@@ -137,65 +137,6 @@ interactioneaza intr-un pipeline de predictie si actualizare.
           actualizarile inutile pe predictii corecte si sigure.
 \end{itemize}
 
-\subsubsection*{Fluxul de functionare}
-
-\paragraph{Predictie.}
-Pentru un PC dat, fiecare tabel $i$ calculeaza un index:
-\[
-  \mathit{idx}_i = \bigl(PC \oplus \mathit{GHR}[0:L[i]]\bigr) \bmod \mathit{tableSize}
-\]
-Contorul de la acel index este citit si adaugat la suma globala. Semnul sumei
-finale produce decizia binara.
-
-\paragraph{Actualizare.}
-Dupa rezolvarea branch-ului, predictorul executa trei operatii in ordine:
-
-\begin{enumerate}
-    \item \textbf{Actualizarea contoarelor de predictie}: daca a existat
-          mispredictie sau $|\mathit{sum}| \leq \theta$, fiecare contor
-          accesat este incrementat (branch \textit{taken}) sau decrementat
-          (branch \textit{not taken}).
-
-    \item \textbf{Ajustarea dinamica a lungimii istoriei}
-          (\textit{Dynamic History Length Fitting}): aliasing counter-ul
-          detecteaza daca mispredictiile recente sunt cauzate de aliasing
-          in tabelul dinamic (tabelul 6). Daca aliasing counter-ul
-          satureaza pozitiv, se comuta la un GHR mai lung pentru tabelele
-          cu indici pari; daca satureaza negativ, se revine la GHR scurt.
-
-    \item \textbf{Ajustarea adaptiva a pragului $\theta$}
-          (\textit{Adaptive Threshold Fitting}): threshold counter-ul este
-          incrementat la mispredictie si decrementat cand predictia este
-          corecta dar $|\mathit{sum}| \leq \theta$. La saturare, valoarea
-          $\theta$ este ajustata in sus sau in jos, adaptand sensibilitatea
-          predictorului la comportamentul curent al programului.
-\end{enumerate}
-
-\subsubsection*{Parametrii predictorului}
-
-Implementarea expune trei parametri configurabili, prezentati in
-Tabelul~\ref{tab:params}.
-
-\begin{table}[H]
-    \centering
-    \small
-    \begin{tabular}{|l|c|c|c|l|}
-        \hline
-        \textbf{Parametru} & \textbf{Implicit} & \textbf{Min} & \textbf{Max} & \textbf{Descriere} \\
-        \hline
-        Numar de tabele ($N$)      & 7    & 4 & 12    & Numarul de tabele de predictie \\
-        Marimea tabelelor          & 2048 & 1 & 88000 & Numarul de intrari per tabel \\
-        Lungimea contoarelor ($k$) & 4    & 3 & 5     & Precizia contoarelor saturate (biti) \\
-        \hline
-        $\alpha$ (raport geometric) & 2   & -- & --   & Factorul de crestere al istoriei \\
-        $L_1$ (istorie minima)      & 2   & -- & --   & Lungimea istoriei pentru tabelul 1 \\
-        $\theta$ initial            & $N$ & -- & --   & Pragul adaptiv de actualizare \\
-        \hline
-    \end{tabular}
-    \caption{Parametrii predictorului OGEHL}
-    \label{tab:params}
-\end{table}
-
 \begin{figure}[H]
 	\centering
 	\includegraphics[width=0.75\linewidth]{images/oghel.png}
