@@ -671,10 +671,8 @@ void sim_main(void)
                     pred,
                     /* branch addr */ regs.regs_PC,
                     /* resolved branch target */ regs.regs_NPC,
-                    /* taken? */ regs.regs_NPC !=
-                        (regs.regs_PC + sizeof(md_inst_t)),
-                    /* pred taken? */ pred_PC !=
-                        (regs.regs_PC + sizeof(md_inst_t)),
+                    /* taken? */ regs.regs_NPC != (regs.regs_PC + sizeof(md_inst_t)),
+                    /* pred taken? */  pred_PC != (regs.regs_PC + sizeof(md_inst_t)),
                     /* correct pred? */ pred_PC == regs.regs_NPC,
                     /* opcode */ op,
                     /* predictor update pointer */ &update_rec);

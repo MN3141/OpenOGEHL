@@ -3,6 +3,7 @@
 #include <math.h>
 #include <stddef.h>
 #include <stdint.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include "bp_types.h"
@@ -81,6 +82,8 @@ BP_STATIC uint32_t BP_GetCntIdx(uint32_t tableIdx, uint32_t pc, bpGhr_t lGhr, si
     {
         index = pc ^ (lGhr & getMask(ghrLen));
     }
+
+    // printf("index = pc (%x) ^ ghr (%x & %x)= %d\n", pc, lGhr, getMask(ghrLen), index % gTableSize);
 
     /* Ensure index is within bounds of the table */
     return index % gTableSize;
@@ -168,14 +171,20 @@ bool BP_GetPrediction(uint32_t pc, int32_t* sum)
 
     *sum = 0;
 
+    // printf("================== PREDICTION ==================\n");
+
+    // printf("pc=%x\n", pc);
+
     for (int tableIdx = 0; tableIdx < gNumOfTables; tableIdx++)
     {
         cntIdx = BP_GetCntIdx(tableIdx, pc, ghr, L[tableIdx]);
 
         cnt = bpTable[tableIdx][cntIdx];
+        // printf("cnt_%x: %ld + ", cntIdx, cnt);
 
         *sum += cnt;
     }
+    // printf("=: %d; prediction: %d\n", *sum, *sum >= 0);
 
     return (*sum >= 0);  /* Use > 0 to predict NOT TAKEN on cold start (when sum == 0) */
 }
@@ -186,30 +195,45 @@ void BP_Update(bool realOutcome, bool predictedOutcome, uint32_t currentPc, uint
     uint32_t lIndex = 0;
 
     /* 3.1.1 Update the predictor counters */
-    if ((predictedOutcome != realOutcome) /* Missprediction */ || (labs(sum) <= theta_threshold) /* Outliar or idk */)
+    if ((predictedOutcome != realOutcome) /* Missprediction */ || (labs(sum) <= theta_threshold) /* Low confidence */)
     {
+        // printf("===================== MISSPREDICT UPDATE =====================\n");
         for (int tableIdx = 0; tableIdx < gNumOfTables; tableIdx++)
         {
+
+            // printf("=============TABLE_%d=============\n", tableIdx);
             lIndex = BP_GetLIndex(useLongGhr, tableIdx);
             cntIdx = BP_GetCntIdx(tableIdx, currentPc, ghr, L[lIndex]);
+            // printf("cntIdx= %d\n", cntIdx);
+            // printf("predicted=%d vs real=%d\n", predictedOutcome, realOutcome);
 
             if (realOutcome)
             {
                 addValToCounter(&bpTable[tableIdx][cntIdx], sizeof(bpCounter_t), gCounterLen, 1 /* value */);
+                // printf("cnt= %d\n", bpTable[tableIdx][cntIdx]);
             }
             else
             {
                 addValToCounter(&bpTable[tableIdx][cntIdx], sizeof(bpCounter_t), gCounterLen, -1 /* value */);
+                // printf("cnt= %d\n", bpTable[tableIdx][cntIdx]);
             }
         }
     }
 
     /* 3.2 Dynamic history length fitting */
     useLongGhr = BP_GetAliasingRatio(realOutcome, predictedOutcome, currentPc, sum);
+    // if (useLongGhr == USE_LONG_GHR)
+    // {
+    //     printf("USING LONG GHR\n");
+    // }else
+    // {
+    //     printf("USING SHORT GHR\n");
+    // }
 
     /* 3.3 Adaptive threshold fitting */
     BP_UpdateThreshold(realOutcome, predictedOutcome, sum);
 
     /* update ghr */
     ghr = (ghr << 1) | realOutcome;
+    // printf("ghr=%b\n", ghr);
 }
