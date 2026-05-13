@@ -250,7 +250,56 @@ Lansand din linia de comanda programul \textit{sim-bpred} fara niciun argument v
 \end{verbatim}
 }
 
-\subsection{Dezvoltarea simulatorului}
+\subsection{Prezentarea predictorului OGhel}
+
+Predictia ramificatiilor reprezinta una dintre tehnicile fundamentale de optimizare a performantei procesoarelor moderne cu pipeline adanc.
+In absenta unei predictii corecte, procesorul este nevoit sa goleasca pipeline-ul si sa reia executia de la adresa corecta,
+operatie cunoscuta sub numele de \textit{branch misprediction penalty}. De-a lungul timpului, cercetatorii au propus o
+varietate de strategii cu complexitati si acurateti diferite.
+
+\textbf{Predictori statici si bazati pe Markov.}
+Cei mai simpli predictori sunt cei statici: \textit{always taken} si \textit{always not-taken}, care nu tin cont de istoricul executiei.
+O treapta superioara o reprezinta predictorul bazat pe \textbf{lanturi Markov}, care modeleaza probabilitatea urmatorului rezultat
+al unui salt in functie de cele $k$ rezultate anterioare ale aceluiasi salt. Desi intuitiv, modelul Markov este limitat de faptul
+ca ia in considerare exclusiv istoricul local al unui singur salt, ignorand corelatiile cu alte ramificatii din program.
+
+\textbf{Predictori globali -- familia GAg/GAp/PAp.}
+Schema \textbf{GAg} (\textit{Global history, All branches, global prediction table}) introduce notiunea de
+\textit{registru de istorie globala} (GHR -- \textit{Global History Register}), in care se acumuleaza
+rezultatele ultimelor $W$ salturi, indiferent de adresa acestora. Indicele in tabela de predictie se
+formeaza direct din GHR. \textbf{GAp} pastreaza istoricul global, dar foloseste tabele de predictie
+per-ramificatie, reducand aliasul dintre intrari. \textbf{PAp} merge mai departe, combinand un
+registru de istorie per-ramificatie cu tabele de predictie individuale. Aceste scheme ofera o
+acuratete ridicata pentru programe cu corelatii inter-ramificatii, insa tabela creste exponential
+cu adancimea istoricului.
+
+\textbf{Predictorul GShare si predictori combinati.}
+\textbf{GShare} aplica operatia XOR intre GHR si adresa PC a saltului pentru a indexa tabela de predictie,
+reducand aliasul fara a creste semnificativ dimensiunea structurii. Predictorii \textbf{combinati} (de tip \textit{tournament}),
+cum este cel implementat in SimpleSim sub optiunea \texttt{comb}, mentin doua predictori de baza si o \textit{meta-tabela}
+care decide dinamic caruia sa ii acorde incredere pentru fiecare salt in parte.
+
+\textbf{Predictori bazati pe perceptron.}
+O directie moderna si importanta este reprezentata de predictorii bazati pe \textbf{perceptron}. Fiecare ramificatie este asociata
+unui vector de ponderi; rezultatul predictiei este determinat de semnul produsului scalar dintre vectorul de ponderi si vectorul de
+istorie globala (codificat ca $\pm 1$). Antrenamentul consta in incrementarea sau decrementarea ponderilor corespunzatoare in functie
+de rezultatul real. Avantajul principal este capacitatea de a captura corelatii liniare pe istorii foarte lungi, la un cost de stocare
+rezonabil. Limita fundamentala a perceptronului simplu consta insa in incapacitatea de a invata functii nelineare: de exemplu, paritatea
+unui sir de biti (corelatii XOR) nu poate fi reprezentata de un model liniar.
+
+\textbf{Predictorul O-GEHL.}
+\textbf{O-GEHL} (\textit{O-Geometric History Length}) depaseste limitarile mentionate mai sus printr-o serie de mecanisme specifice.
+In locul unei singure tabele indexate dupa un istoric de lungime fixa, O-GEHL utilizeaza \textbf{mai multe tabele independente} $T_0, T_1, \ldots, T_{M-1}$,
+fiecare indexata dupa un istoric de lungime diferita. Lungimile istoricului formeaza o \textbf{progresie geometrica}: $L_i = \lfloor \alpha^i \cdot L_0 \rceil$,
+unde $\alpha > 1$ este un factor de scala. Aceasta alegere asigura acoperirea uniforma a fenomenelor de corelatie la scari multiple ale
+istoricului, de la corelatie pe termen scurt pana la corelatie pe termen lung. Predictia finala se obtine prin \textbf{suma algebrica}
+a valorilor contoarelor saturate extrase din fiecare tabela -- un mecanism similar votului ponderat al unui ansamblu de perceptroni,
+dar fara a fi limitat la corelatii liniare, datorita indexarii diferentiate. Aceasta suma este comparata cu zero: daca este pozitiva,
+saltul este prezis ca efectuat (\textit{taken}), altfel ca neefectuat. Spre deosebire de predictori globali simpli, \textbf{aliasul}
+este gestionat prin diversificarea functiilor de indexare: fiecare tabela foloseste o combinatie diferita de biti din PC si din GHR,
+reducand probabilitatea ca doua ramificatii distincte sa partajeze acelasi contor in toate tabelele simultan. In concluzie, O-GEHL
+reuneste avantajele istoricului global (capturarea corelatiilor inter-ramificatii), ale lungimilor geometrice (acoperire multi-scala),
+si ale votului prin suma (robustete la zgomot si alias), oferind o acuratete superioara predictorilor clasici la un buget de hardware comparabil.
 
 \subsection{Compiland OpenOGEHL}
 Asa cum am promis in capitolul anterior, este timpul sa prezentam succint modul in care OpenOGEHL (fie in varianta ei clasica sau ca modul integrat) este compilat.\\
@@ -366,7 +415,7 @@ Ca urmare a efortului nostru de a integra predictorul OGEHL in cadrul SimpleSim 
 	
 \end{verbatim}
 
-\subsubsection{Arhitectura software a aplicatiei}
+\subsubsection{Arhitectura software OpenOGEHL clasic}
 Pentru a asigura o buna calitate software a aplicatiei si potentiala extindere a acesteia in diferite directii, s-a pus problema intocmirii unei arhitecturi simple dar robuste. Vom discuta in cele ce urmeaza cum a fost aceasta realizata pentru aplicatia clasica de OpenOGEHL, aceste decizii fiind valabile intr-o masura sau alta si in momentul integrarii cu SimpleSim.\\
 
 In ansamblu, aplicatia este constituita din urmatoarele componente principale: fisierele de tip trace ce conțin traseul parcurs de program, interfata grafica, responsabila pentru redarea utilizatorului a informatiilor necesare, preluarea configurarilor acestuia si transmiterea datelor necesare predictorului de salt (ex: numarul de tabele folosit), si intr-un final, predictorul de salturi in sine, ce implementeaza algoritmul O-GEHL discutat anterior, responsabila de a asemenea cu returnarea catre interfata grafica a ratei de miss (cat la suta din numarul prezis de salturi nu s-au efectuat de fapt)
@@ -377,7 +426,7 @@ In ansamblu, aplicatia este constituita din urmatoarele componente principale: f
 	\caption{Componentele principale}
 \end{figure}
 
-La nivel de implementare software aplicatia pleacă de la un punct de start (numit deseori entry point in literatura de specialitate) dupa care se bifurca in doua fire de executie, unul pentru interfata grafica si altul pentru predictorul de salturi (abreviat drept BP). Aceasta decizie a fost luata din considerente de performanta si experienta a utilizatorului, anume sarcinile de calcul a preditiei care implica un consum de resurse mare de resurse au fost izolate de cele de redare a interfetei grafice. Evident, acest avantaj este valabil doar in sistemele avand procesoare cu mai multe nuclee (altfel, in loc de executie paralela are loc executie concurenta). Data fiind natura
+La nivel de implementare software aplicatia pleaca de la un punct de start (numit deseori entry point in literatura de specialitate) dupa care se bifurca in doua fire de executie, unul pentru interfata grafica si altul pentru predictorul de salturi (abreviat drept BP). Aceasta decizie a fost luata din considerente de performanta si experienta a utilizatorului, anume sarcinile de calcul a preditiei care implica un consum de resurse mare de resurse au fost izolate de cele de redare a interfetei grafice. Evident, acest avantaj este valabil doar in sistemele avand procesoare cu mai multe nuclee (altfel, in loc de executie paralela are loc executie concurenta). Data fiind natura
 bibliotecilor grafice folosite (raylib, respectiv raygui) firul principal
 de executie revine interfetei cu utilizatorul.
 
@@ -387,10 +436,23 @@ de executie revine interfetei cu utilizatorul.
 	\caption{Interactiunea in timp a sistemului}
 \end{figure}
 
-Fiind acum familiar despre cum a fost aplicatia proiectata initial, este momentul sa discutam despre masurile luate pentru integrarea acesteia. Daca este sa ne aducem aminte de arhitectura SimpleSim vom observa usor ca predictorul nostru de ramificatii este situat la nivelul cel mai de jos, adica la nivelul Performance Core (responsabil pentru redarea comportamentului executiei micro-arhitecturii procesorului).Astfel, componenta grafica implementata de noi nu ne mai este folositoare, caci SimpleSim ofera deja utilizatorului o anumita interfata cu care poate lucra. Nemaifiind nevoie de un GUI evident ca putem simplifica structura si mai mult prin eliminarea firelor de executie, ramanand astfel doar cu logica ce implementeaza comportamentul unui predictor tip O-GEHL.
+\subsubsection{Arhitectura software OpenOGEHL integrat}
+Fiind acum familiari despre cum a fost aplicatia proiectata initial, este momentul sa discutam despre masurile luate pentru integrarea acesteia. Daca este sa ne aducem aminte de arhitectura SimpleSim vom observa usor ca predictorul nostru de ramificatii este situat la nivelul cel mai de jos, adica la nivelul Performance Core (responsabil pentru redarea comportamentului executiei micro-arhitecturii procesorului).Astfel, componenta grafica implementata de noi nu ne mai este folositoare, caci SimpleSim ofera deja utilizatorului o anumita interfata cu care poate lucra. Nemaifiind nevoie de un GUI evident ca putem simplifica structura si mai mult prin eliminarea firelor de executie, ramanand astfel doar cu logica ce implementeaza comportamentul unui predictor tip O-GEHL. \\
+
 
 \begin{figure}[H]
 	\centering
 	\includegraphics[width=0.7\textwidth]{images/sim_drawio.png}
 	\caption{OpenOGEHL ca parte a SimpleScalar}
 \end{figure}
+
+
+Din perspectiva programarii, fiecare modul din SimpleScalar este alcatuit dintr-un fisier antet (*.h) ce defineste interfata disponibila utilizatorului si un fisier de implementare (*.c). Cu exceptia a catorva fisiere *.h OpenOGEHL nu se abata de la aceasta regula si poate fi folosit in program prin simpla includere a antetului \textit{bp.h}. In cazul acestui proiect modulul este inclus ca parte a \textit{bpred} conform figurei urmatoare:
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=0.7\textwidth]{images/arch2.png}
+	\caption{Includerea OpenOGEHL la nivel de fisier}
+\end{figure}
+
+Aceasta includere nici macar nu este resimtita de catre programator deoarece din punctul sau de vedere el sau ea lucreaza doar cu componenta bpred. Evident, data fiind natura limbajului C in care nu exista o separare rigida intre interfata si implementare (cum ar fi de exemplu cazul limbajului C++), nimic nu impiedica utilizarea directa a OpenOGEHL a aplicatiei trecand astfel peste un nivel intermediar.
